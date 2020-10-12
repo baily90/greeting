@@ -1,0 +1,45 @@
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const VConsolePlugin = require('vconsole-webpack-plugin')
+
+module.exports = {
+  pages: {
+    home: {
+      // page 的入口
+      entry: './src/pages/focus/myFocus.js',
+      // 模板来源
+      template: './src/pages/focus/myFocus.html',
+      // 在 dist/index.html 的输出
+      filename: 'myFocus.html',
+      // 当使用 title 选项时，
+      // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
+      title: '我的关注'
+    }
+  },
+  productionSourceMap: false,
+  // 配置全局样式变量
+  // css: {
+  //   loaderOptions: {
+  //     // 给 sass-loader 传递选项
+  //     sass: {
+  //       prependData: '@import "@/assets/styles/base.scss";'
+  //     }
+  //   }
+  // },
+  configureWebpack: {
+    plugins: [
+      new CompressionWebpackPlugin({
+        compressionOptions: {
+          numiterations: 15
+        },
+        filename: '[path].gz[query]',
+        algorithm: 'gzip',
+        threshold: 10240,
+        minRatio: 0.8
+      }),
+      new VConsolePlugin({
+        filter: [],
+        enable: process.env.NODE_ENV !== 'production'
+      })
+    ]
+  }
+}
