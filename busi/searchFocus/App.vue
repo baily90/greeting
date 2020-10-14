@@ -5,11 +5,11 @@
       <div class="search">
         <div class="input-area">
           <img class="icon-search" src="./assets/icon-search.png" alt="">
-          <input v-focus type="text" placeholder="输入同事姓名/工号">
+          <van-field  ref="input" v-model="keywords" placeholder="输入同事姓名/工号" :center="true" :autofocus="true" @focus="focusHandler" />
         </div>
         <div class="btn-area">
-          <!-- <span class="btn-search">搜索</span> -->
-          <img class="btn-clear" src="./assets/icon-clear.png" alt="">
+          <span class="btn-search" @click="search" v-if="!isSearched">搜索</span>
+          <img class="btn-clear" v-if="isSearched" src="./assets/icon-clear.png" @click="clearKeywords">
         </div>
       </div>
     </div>
@@ -30,10 +30,15 @@
 </template>
 
 <script>
+import { Field, Toast } from 'vant'
 export default {
-  components: {},
+  components: {
+    [Field.name]: Field
+  },
   data() {
     return {
+      keywords: '',
+      isSearched: false,
       list: []
     }
   },
@@ -42,17 +47,23 @@ export default {
   },
   methods: {
     init() {
-
-    }
-  },
-  directives: {
-    focus: {
-      inserted: function(el) {
-        el.focus()
-      },
-      update: function(el) {
-        el.focus()
+      
+    },
+    search() {
+      if(!this.keywords || !this.keywords.trim())  {
+        Toast('请输入同事姓名/工号')
+        this.list = []
+        return
       }
+      this.isSearched = true
+      this.list.push(1)
+    },
+    clearKeywords() {
+      this.keywords = ''
+      this.$refs.input.focus()
+    },
+    focusHandler() {
+      this.isSearched = false
     }
   }
 }
@@ -115,15 +126,11 @@ input {
       .input-area {
         display: flex;
         align-items: center;
+        width: 500px;
         .icon-search {
           margin-right: 6px;
           width: 36px;
           height: 36px;
-        }
-        input {
-          width: 400px;
-          height: 40px;
-          line-height: 40px;
         }
       }
       .btn-area {

@@ -18,7 +18,7 @@
       暂无关注
     </div>
     <div class="btn-bottom">
-      <div class="btn">
+      <div class="btn" @click="go2SearchFocus">
         <img class="icon-add" src="./assets/icon-add.png" alt="">
         搜索关注
       </div>
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import utils from './../../common/util'
 export default {
   components: {},
   data() {
@@ -34,12 +35,24 @@ export default {
       list: []
     }
   },
+  computed:  {
+    host() {
+      return utils.hostRefect()
+    }
+  },
   created() {
     this.init()
   },
   methods: {
     init() {
-
+      // const CORPID = 1
+      // const REDIRECT_URI = location.href
+      // const STATE = 'ABC'
+      // location.href=`https://open.weixin.qq.com/connect/oauth2/authorize?appid=${CORPID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=snsapi_base&state=${STATE}#wechat_redirect`
+      // wx.
+    },
+    go2SearchFocus() {
+      location.href = `${this.host}/searchFocus`
     }
   }
 }
