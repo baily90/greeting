@@ -1,0 +1,129 @@
+$base_fontSize: 75;
+
+@mixin border-1px($color, $pos) {
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    left: 0;
+
+    @each $item in $pos {
+      border-#{$item}: 1px solid $color;
+      #{$item}: 0;
+    }
+  }
+}
+
+@mixin px2rem($name, $px) {
+  #{$name}: $px / $base_fontSize * 1rem;
+}
+
+@function px2remFun($px) {
+  @return $px / $base_fontSize * 1rem;
+}
+
+@media (-webkit-min-device-pixel-ratio: 1.5),
+(min-device-pixel-ratio: 1.5) {
+  .border-1px &::after {
+    -webkit-transform: scaleY(0.7);
+    transform: scaleY(0.7);
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-device-pixel-ratio: 2) {
+  .border-1px {
+    &::after {
+      -webkit-transform: scaleY(0.5); //像素比为2的时候，我们设置缩放为0.5
+      transform: scaleY(0.5);
+    }
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 3),
+(min-device-pixel-ratio: 3) {
+  .border-1px &::after {
+    -webkit-transform: scaleY(0.333333); //像素比为3的时候，我们设置缩放为0.33333
+    transform: scaleY(0.333333);
+  }
+}
+
+/*
+升级版
+*/
+@mixin side-parse($color, $border:1px, $side:all, $radius:0, $style: solid) {
+  @if ($side==all) {
+    border: $border $style $color;
+    /*no*/
+  }
+
+  @else {
+    border-#{$side}: $border $style $color;
+    /*no*/
+  }
+}
+
+@mixin border-s1px($color, $border:1px, $side:all, $radius:0, $style: solid) {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    @include side-parse($color, $border, $side, $radius, $style);
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+
+    @media (max--moz-device-pixel-ratio: 1.49),
+    (-webkit-max-device-pixel-ratio: 1.49),
+    (max-device-pixel-ratio: 1.49),
+    (max-resolution: 143dpi),
+    (max-resolution: 1.49dppx) {
+      width: 100%;
+      height: 100%;
+      border-radius: $radius;
+    }
+
+    @media (min--moz-device-pixel-ratio: 1.5) and (max--moz-device-pixel-ratio: 2.49),
+    (-webkit-min-device-pixel-ratio: 1.5) and (-webkit-max-device-pixel-ratio: 2.49),
+    (min-device-pixel-ratio: 1.5) and (max-device-pixel-ratio: 2.49),
+    (min-resolution: 144dpi) and (max-resolution: 239dpi),
+    (min-resolution: 1.5dppx) and (max-resolution: 2.49dppx) {
+      width: 200%;
+      height: 200%;
+      transform: scale(.5);
+      -webkit-transform: scale(.5);
+      border-radius: $radius * 2;
+    }
+
+    @media (min--moz-device-pixel-ratio: 2.5),
+    (-webkit-min-device-pixel-ratio: 2.5),
+    (min-device-pixel-ratio: 2.5),
+    (min-resolution: 240dpi),
+    (min-resolution: 2.5dppx) {
+      width: 300%;
+      height: 300%;
+      transform: scale(0.333);
+      -webkit-transform: scale(0.333);
+      border-radius: $radius * 3;
+    }
+  }
+}
+
+button {
+  outline: none;
+  border: none;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
