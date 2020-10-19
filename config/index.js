@@ -1,7 +1,5 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 const path = require('path');
-const PROXYURL = 'http://air.nongnet.net'
-
 module.exports = {
     basePathStr: 'busi',
     componentPathStr: 'components',
@@ -42,26 +40,15 @@ module.exports = {
         autoOpenBrowser: false,
         assetsSubDirectory: '',
         assetsPublicPath: '/',
-        proxyTable: [
+        proxyTable: 
+        [
             {
-                pattern: ['/wx'],
+                pattern: ['/hrapi'],
                 options: {
-                    target: PROXYURL,
+                    target: 'http://hr.qa.tcent.cn',
                     changeOrigin: true,
-                    secure: false, //不验证证书的安全性
                     pathRewrite: {
-                        '/wx': '/wx', // rewrite path
-                    }
-                }
-            },
-            {
-                pattern: ['/weixin'],
-                options: {
-                    target: PROXYURL,
-                    changeOrigin: true,
-                    secure: false, //不验证证书的安全性
-                    pathRewrite: {
-                        '/weixin': '/weixin', // rewrite path
+                        '^/hrapi': '/hrapi', // rewrite path
                     }
                 }
             }

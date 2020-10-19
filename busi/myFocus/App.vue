@@ -5,12 +5,12 @@
       <div class="item-focus" v-for="(item, index) in list" :key="index">
         <div class="info-focus">
           <div class="user-info">
-            <div class="name">张三</div>
-            <div class="base">（1091891 研发组）</div>
+            <div class="name">{{item.EMPLOYEE_NAME}}</div>
+            <div class="base">（{{item.EMPLOYEE_CODE}} {{item.DEPARTMENT_NAME}})</div>
           </div>
-          <div class="time-focus">关注时间：2020-10-14</div>
+          <div class="time-focus">关注时间：{{item.FOCUS_TIME}}</div>
         </div>
-        <div class="btn-focus">已关注</div>
+        <div class="btn-focus" :class="{'act':item.IS_CARE != 1}" @click="UpdateStatus(item)">{{item.IS_CARE == 1 ? '已关注':'关注'}}</div>
       </div>
     </div>
     <div class="empty" v-if="!list || !list.length">
@@ -28,10 +28,12 @@
 
 <script>
 import utils from './../../common/util'
+import { FocusList, UpdateStatus } from './service'
 export default {
   components: {},
   data() {
     return {
+      loginUserId: utils.getPara('loginUserId'),
       list: []
     }
   },
@@ -45,14 +47,36 @@ export default {
   },
   methods: {
     init() {
-      // const CORPID = 1
-      // const REDIRECT_URI = location.href
-      // const STATE = 'ABC'
-      // location.href=`https://open.weixin.qq.com/connect/oauth2/authorize?appid=${CORPID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=snsapi_base&state=${STATE}#wechat_redirect`
-      // wx.
+      this.FocusList()
+    },
+    async FocusList() {
+      try {
+        const {data} = await FocusList({loginUserId:this.loginUserId,focusName:''})
+        if(data && data.ResultCode == 0) {
+          this.list = data.Data
+        }
+      } catch (error) {
+        console.log('FocusList接口异常'+error)
+      }
+    },
+    async UpdateStatus(emp) {
+      try {
+        const isCare = emp.IS_CARE == 1
+        const {data} = await UpdateStatus({loginUserId:this.loginUserId, careCode: emp.EMPLOYEE_CODE, careStatus: isCare ? '0' : '1'})
+        if(data && data.ResultCode == 0) {
+          this.list.map(item => {
+            if(item.EMPLOYEE_CODE == emp.EMPLOYEE_CODE) {
+              item.IS_CARE = isCare ? '0' : '1'
+            }
+            return item
+          })
+        }
+      } catch (error) {
+        console.log('UpdateStatus接口异常:'+error)
+      }
     },
     go2SearchFocus() {
-      location.href = `${this.host}/searchFocus`
+      location.href = `${this.host}/searchFocus?loginUserId=${this.loginUserId}`
     }
   }
 }

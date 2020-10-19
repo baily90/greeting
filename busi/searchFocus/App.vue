@@ -16,10 +16,10 @@
     <div class="list-search" v-if="list && list.length">
       <div class="item-search" v-for="(item, index) in list" :key="index">
         <div class="info-focus">
-            <div class="name">张三</div>
-            <div class="base">（1091891 研发组）</div>
+            <div class="name">{{item.EMPLOYEE_NAME}}</div>
+            <div class="base">（{{item.EMPLOYEE_CODE}} {{item.DEPARTMENT_NAME}})</div>
         </div>
-        <div class="btn-focus">已关注</div>
+        <div class="btn-focus" :class="{'act':item.IS_CARE != 1}" @click="UpdateStatus(item)">{{item.IS_CARE == 1 ? '已关注':'关注'}}</div>
       </div>
     </div>
     <div class="empty" v-if="!list || !list.length">
@@ -30,13 +30,16 @@
 </template>
 
 <script>
+import utils from './../../common/util'
 import { Field, Toast } from 'vant'
+import { FocusList, UpdateStatus } from './service'
 export default {
   components: {
     [Field.name]: Field
   },
   data() {
     return {
+      loginUserId: utils.getPara('loginUserId'),
       keywords: '',
       isSearched: false,
       list: []
@@ -56,7 +59,33 @@ export default {
         return
       }
       this.isSearched = true
-      this.list.push(1)
+      this.FocusList()
+    },
+    async FocusList() {
+      try {
+        const {data} = await FocusList({loginUserId:this.loginUserId,focusName: this.keywords})
+        if(data && data.ResultCode == 0) {
+          this.list = data.Data
+        }
+      } catch (error) {
+        console.log('FocusList接口异常'+error)
+      }
+    },
+    async UpdateStatus(emp) {
+      try {
+        const isCare = emp.IS_CARE == 1
+        const {data} = await UpdateStatus({loginUserId:this.loginUserId, careCode: emp.EMPLOYEE_CODE, careStatus: isCare ? '0' : '1'})
+        if(data && data.ResultCode == 0) {
+          this.list.map(item => {
+            if(item.EMPLOYEE_CODE == emp.EMPLOYEE_CODE) {
+              item.IS_CARE = isCare ? '0' : '1'
+            }
+            return item
+          })
+        }
+      } catch (error) {
+        console.log('UpdateStatus接口异常:'+error)
+      }
     },
     clearKeywords() {
       this.keywords = ''
