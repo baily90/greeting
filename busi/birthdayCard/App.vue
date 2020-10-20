@@ -8,6 +8,9 @@
           滑动解锁更多精彩
           <div class="icon-arrow"></div>
         </div>
+        <div class="copy-content" v-if="item.copy">
+          {{item.copy}}
+        </div>
       </van-swipe-item>
     </van-swipe>
   </div>
@@ -47,13 +50,13 @@ export default {
         const {data} = await EmployeeWishByCompany({id:this.id,UserId:this.UserId,wishType:this.wishType})
         if(data && data.ResultCode == 0) {
           const resData = data.Data
-          const TWEET_IMG = resData.TWEET_IMG // 封面
           const COPY_LIST = resData.COPY_LIST // 祝福语
           const CARD_BACKGROUND = resData.CARD_BACKGROUND // 贺卡背景
           const COLLEAGUES_BLESSING_LIST = resData.COLLEAGUES_BLESSING_LIST // 同事祝福
-          TWEET_IMG && TWEET_IMG.forEach(tweet => {
+          CARD_BACKGROUND  && CARD_BACKGROUND.forEach((blessing, index) =>  {
             this.list.push({
-              backgroundImg: tweet.URL
+              copy: COPY_LIST && COPY_LIST[index] && COPY_LIST[index].COPY,
+              backgroundImg: blessing.URL
             })
           })
           COLLEAGUES_BLESSING_LIST  && COLLEAGUES_BLESSING_LIST.forEach(blessing =>  {
@@ -113,6 +116,18 @@ export default {
         background-size: cover;
         animation: arrow .6s ease-in-out infinite alternate;
       }
+    }
+    .copy-content {
+      position: absolute;
+      top: 42px;
+      left: 36px;
+      width: 420px;
+      padding: 26px 32px 24px 26px;
+      font-size: 24px;
+      color: #762400;
+      line-height: 48px;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0px 4px 12px rgba(191, 107, 107, 0.16);
     }
   }
   
