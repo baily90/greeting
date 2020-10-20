@@ -2,7 +2,7 @@
   <div class="container-receivedWishes">
     <div class="bg-page"></div>
     <div class="list-wishes" v-if="list && list.length">
-      <div class="item-wishes" v-for="(item, index) in list" :key="index">
+      <div class="item-wishes" v-for="(item, index) in list" :key="index" @click="go2Card(item)">
         <div class="date">{{item.SEND_TIME  | dateFormat('yyyy-MM-dd hh:mm:ss')}}</div>
         <div class="content-wishes">
           <div class="img-wrap">
@@ -47,6 +47,13 @@ export default {
         }
       } catch (error) {
         console.log('EmployeeWishHistoryList接口异常'+error)
+      }
+    },
+    go2Card(obj) {
+      if(obj.WISH_TYPE == 'YEAR') {
+        location.href = `${this.host}/birthdayCard?id=${obj.ROW_ID}&UserId=${obj.EMPLOYEE_ID}&wishType=${obj.WISH_TYPE}`
+      }else {
+        location.href = `${this.host}/birthdayCard?id=${obj.ROW_ID}&UserId=${obj.EMPLOYEE_ID}&wishType=${obj.WISH_TYPE}`
       }
     }
   }

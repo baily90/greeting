@@ -13,16 +13,18 @@
         </div>
       </div>
     </div>
-    <div class="list-search" v-if="list && list.length">
-      <div class="item-search" v-for="(item, index) in list" :key="index">
-        <div class="info-focus">
-            <div class="name">{{item.EMPLOYEE_NAME}}</div>
-            <div class="base">（{{item.EMPLOYEE_CODE}} {{item.DEPARTMENT_NAME}})</div>
+    <van-list v-if="firstRenderComplete && list && list.length" v-model="isLoading" :finished="isFinished" @load="onLoad" :immediate-check="false">
+      <div class="list-search">
+        <div class="item-search" v-for="(item, index) in list" :key="index">
+          <div class="info-focus">
+              <div class="name">{{item.EMPLOYEE_NAME}}</div>
+              <div class="base">（{{item.EMPLOYEE_CODE}} {{item.DEPARTMENT_NAME}})</div>
+          </div>
+          <div class="btn-focus" :class="{'act':item.IS_CARE != 1}" @click="UpdateStatus(item)">{{item.IS_CARE == 1 ? '已关注':'关注'}}</div>
         </div>
-        <div class="btn-focus" :class="{'act':item.IS_CARE != 1}" @click="UpdateStatus(item)">{{item.IS_CARE == 1 ? '已关注':'关注'}}</div>
       </div>
-    </div>
-    <div class="empty" v-if="!list || !list.length">
+    </van-list>
+    <div class="empty" v-if="firstRenderComplete && (!list || !list.length)">
       <img class="icon-empty" src="./assets/icon-empty.png" alt="">
       暂无搜索记录
     </div>
@@ -33,15 +35,21 @@
 import utils from './../../common/util'
 import { Field, Toast } from 'vant'
 import { FocusList, UpdateStatus } from './service'
+import { List } from 'vant'
 export default {
   components: {
-    [Field.name]: Field
+    [Field.name]: Field,
+    [List.name]: List
   },
   data() {
     return {
       loginUserId: utils.getPara('loginUserId'),
       keywords: '',
       isSearched: false,
+      isLoading: false,
+      isFinished: false,
+      firstRenderComplete: false,
+      pageNum: 1,
       list: []
     }
   },
@@ -58,16 +66,34 @@ export default {
         this.list = []
         return
       }
+      this.pageNum = 1
+      this.list = []
+      this.firstRenderComplete = false
       this.isSearched = true
+      this.FocusList()
+    },
+    onLoad() {
       this.FocusList()
     },
     async FocusList() {
       try {
-        const {data} = await FocusList({loginUserId:this.loginUserId,focusName: this.keywords})
+        const {data} = await FocusList({loginUserId:this.loginUserId,focusName: this.keywords,page: this.pageNum})
         if(data && data.ResultCode == 0) {
-          this.list = data.Data
+          if (this.pageNum == 1) {
+            this.list = data.Data
+          } else {
+            this.list = this.list.concat(data.Data)
+          }
+          this.isFinished = data.TOTALCOUNT - this.pageNum*30 <= 0
+          this.firstRenderComplete = true
+          this.isLoading = false
+          if (!this.isFinished) {
+            this.pageNum++
+          }
         }
       } catch (error) {
+        this.firstRenderComplete = true
+        this.isLoading = false
         console.log('FocusList接口异常'+error)
       }
     },

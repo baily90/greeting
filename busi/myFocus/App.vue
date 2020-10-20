@@ -1,19 +1,21 @@
 <template>
   <div class="container-myFocus">
     <div class="bg-page"></div>
-    <div class="list-focus" v-if="list && list.length">
-      <div class="item-focus" v-for="(item, index) in list" :key="index">
-        <div class="info-focus">
-          <div class="user-info">
-            <div class="name">{{item.EMPLOYEE_NAME}}</div>
-            <div class="base">（{{item.EMPLOYEE_CODE}} {{item.DEPARTMENT_NAME}})</div>
+    <van-list v-if="firstRenderComplete && list && list.length" v-model="isLoading" :finished="isFinished" @load="onLoad" :immediate-check="false">
+      <div class="list-focus">
+        <div class="item-focus" v-for="(item, index) in list" :key="index">
+          <div class="info-focus">
+            <div class="user-info">
+              <div class="name">{{item.EMPLOYEE_NAME}}</div>
+              <div class="base">（{{item.EMPLOYEE_CODE}} {{item.DEPARTMENT_NAME}})</div>
+            </div>
+            <div class="time-focus">关注时间：{{item.FOCUS_TIME | dateFormat}}</div>
           </div>
-          <div class="time-focus">关注时间：{{item.FOCUS_TIME | dateFormat}}</div>
+          <div class="btn-focus" :class="{'act':item.IS_CARE != 1}" @click="UpdateStatus(item)">{{item.IS_CARE == 1 ? '已关注':'关注'}}</div>
         </div>
-        <div class="btn-focus" :class="{'act':item.IS_CARE != 1}" @click="UpdateStatus(item)">{{item.IS_CARE == 1 ? '已关注':'关注'}}</div>
       </div>
-    </div>
-    <div class="empty" v-if="!list || !list.length">
+    </van-list>
+    <div class="empty" v-if="firstRenderComplete  && (!list || !list.length)">
       <img class="icon-empty" src="./assets/icon-empty.png" alt="">
       暂无关注
     </div>
@@ -29,11 +31,18 @@
 <script>
 import utils from './../../common/util'
 import { FocusList, UpdateStatus } from './service'
+import { List } from 'vant'
 export default {
-  components: {},
+  components: {
+    [List.name]: List
+  },
   data() {
     return {
       loginUserId: utils.getPara('loginUserId'),
+      isLoading: false,
+      isFinished: false,
+      firstRenderComplete: false,
+      pageNum: 1,
       list: []
     }
   },
@@ -49,13 +58,28 @@ export default {
     init() {
       this.FocusList()
     },
+    onLoad() {
+      this.FocusList()
+    },
     async FocusList() {
       try {
-        const {data} = await FocusList({loginUserId:this.loginUserId,focusName:''})
+        const {data} = await FocusList({loginUserId:this.loginUserId,focusName:'',page: this.pageNum})
         if(data && data.ResultCode == 0) {
-          this.list = data.Data
+          if (this.pageNum == 1) {
+            this.list = data.Data
+          } else {
+            this.list = this.list.concat(data.Data)
+          }
+          this.isFinished = data.TOTALCOUNT - this.pageNum*30 <= 0
+          this.firstRenderComplete = true
+          this.isLoading = false
+          if (!this.isFinished) {
+            this.pageNum++
+          }
         }
       } catch (error) {
+        this.firstRenderComplete = true
+        this.isLoading = false
         console.log('FocusList接口异常'+error)
       }
     },

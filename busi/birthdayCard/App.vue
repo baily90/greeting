@@ -55,9 +55,6 @@ export default {
             this.list.push({
               backgroundImg: tweet.URL
             })
-            this.list.push({
-              backgroundImg: tweet.URL
-            })
           })
           COLLEAGUES_BLESSING_LIST  && COLLEAGUES_BLESSING_LIST.forEach(blessing =>  {
             this.list.push({

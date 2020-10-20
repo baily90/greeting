@@ -5,5 +5,5 @@ export function FocusList(params) {
 }
 
 export function UpdateStatus(params) {
-  return axiosWrap.post(`${apis.getUrls().UpdateStatus}`, params)
+  return axiosWrap.get(`${apis.getUrls().UpdateStatus}`, {params})
 }
