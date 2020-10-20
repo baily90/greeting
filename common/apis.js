@@ -17,7 +17,9 @@ export default {
       // 关注、取消关注
       UpdateStatus: `${hostname}/hrapi/api/MocApiGeneralV2/UpdateStatus`,
       // 历史收到的祝福
-      EmployeeWishHistoryList: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishHistoryList`
+      EmployeeWishHistoryList: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishHistoryList`,
+      // 贺卡
+      EmployeeWishByCompany: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishByCompany`
     }
   },
 

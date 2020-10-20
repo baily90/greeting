@@ -3,11 +3,11 @@
     <div class="bg-page"></div>
     <van-swipe class="my-swipe" :vertical="true" :show-indicators="false" :loop="false">
       <van-swipe-item v-for="(item, index) in list" :key="index">
-        <div class="btn-arrow" v-if="index ==  0">
-          滑动解锁更多
+        <img class="img-bg" v-lazy="item.backgroundImg" alt="">
+        <div class="btn-arrow">
+          滑动解锁更多精彩
           <div class="icon-arrow"></div>
         </div>
-        <img class="img-bg" v-lazy="item" alt="">
       </van-swipe-item>
     </van-swipe>
   </div>
@@ -15,6 +15,7 @@
 
 <script>
 import { Swipe, SwipeItem } from 'vant'
+import { EmployeeWishByCompany } from './service'
 import utils from './../../common/util'
 export default {
   components: {
@@ -23,6 +24,9 @@ export default {
   },
   data() {
     return {
+      id: utils.getPara('id'),
+      UserId: utils.getPara('UserId'),
+      wishType: utils.getPara('wishType'),
       list: []
     }
   },
@@ -36,8 +40,33 @@ export default {
   },
   methods: {
     init() {
-      for(let i=1;i<=10;i++) {
-        this.list.push('http://bpic.588ku.com/back_list_pic/19/11/26/a54f7b66f962db3d832017b600431123.jpg!/fw/320/quality/90/unsharp/true/compress/true')
+      this.EmployeeWishByCompany()
+    },
+    async EmployeeWishByCompany () {
+      try {
+        const {data} = await EmployeeWishByCompany({id:this.id,UserId:this.UserId,wishType:this.wishType})
+        if(data && data.ResultCode == 0) {
+          const resData = data.Data
+          const TWEET_IMG = resData.TWEET_IMG // 封面
+          const COPY_LIST = resData.COPY_LIST // 祝福语
+          const CARD_BACKGROUND = resData.CARD_BACKGROUND // 贺卡背景
+          const COLLEAGUES_BLESSING_LIST = resData.COLLEAGUES_BLESSING_LIST // 同事祝福
+          TWEET_IMG && TWEET_IMG.forEach(tweet => {
+            this.list.push({
+              backgroundImg: tweet.URL
+            })
+            this.list.push({
+              backgroundImg: tweet.URL
+            })
+          })
+          COLLEAGUES_BLESSING_LIST  && COLLEAGUES_BLESSING_LIST.forEach(blessing =>  {
+            this.list.push({
+              backgroundImg: blessing.CARD_BACKGROUND
+            })
+          })
+        }
+      } catch (error) {
+        console.log('FocusList接口异常'+error)
       }
     }
   }
@@ -73,7 +102,7 @@ export default {
       margin-left: -116px;
       width: 232px;
       font-size: 28px;
-      color: #FFEDB7;
+      color: #fff;
       text-align: center;
       line-height: 50px;
       .icon-arrow {
@@ -83,6 +112,8 @@ export default {
         margin-left: -17px;
         width: 34px;
         height: 15px;
+        background: url(./assets/icon-arrow.png) no-repeat center center;
+        background-size: cover;
         animation: arrow .6s ease-in-out infinite alternate;
       }
     }
