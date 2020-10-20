@@ -8,7 +8,7 @@
             <div class="name">{{item.EMPLOYEE_NAME}}</div>
             <div class="base">（{{item.EMPLOYEE_CODE}} {{item.DEPARTMENT_NAME}})</div>
           </div>
-          <div class="time-focus">关注时间：{{item.FOCUS_TIME}}</div>
+          <div class="time-focus">关注时间：{{item.FOCUS_TIME | dateFormat}}</div>
         </div>
         <div class="btn-focus" :class="{'act':item.IS_CARE != 1}" @click="UpdateStatus(item)">{{item.IS_CARE == 1 ? '已关注':'关注'}}</div>
       </div>

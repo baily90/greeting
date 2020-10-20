@@ -15,7 +15,9 @@ export default {
       // 我的关注
       FocusList: `${hostname}/hrapi/api/MocApiGeneralV2/FocusList`,
       // 关注、取消关注
-      UpdateStatus: `${hostname}/hrapi/api/MocApiGeneralV2/UpdateStatus`
+      UpdateStatus: `${hostname}/hrapi/api/MocApiGeneralV2/UpdateStatus`,
+      // 历史收到的祝福
+      EmployeeWishHistoryList: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishHistoryList`
     }
   },
 

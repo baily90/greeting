@@ -1,40 +1,54 @@
 <template>
   <div class="container-receivedWishes">
     <div class="bg-page"></div>
-    <div class="list-data" v-if="list && list.length">
-      <div class="item-data" v-for="(data, dataIndex) in list" :key="dataIndex">
-        <div class="date">{{data.date}}</div>
-        <div class="list-wishes" v-if="data.list && data.list.length">
-          <div class="item-wishes" v-for="(item, index) in data.list" :key="index">
-            <div class="img-wrap">
-              <img src="https://pics.lvjs.com.cn/pics/super/2020/09/1601285985_16800.jpg" alt="">
-            </div>
-            <div class="first-title">在这个特别的日子，祝福您生日快乐！</div>
-            <div class="second-title">您的同事生日快到了，快快送上你的祝福吧！</div>
+    <div class="list-wishes" v-if="list && list.length">
+      <div class="item-wishes" v-for="(item, index) in list" :key="index">
+        <div class="date">{{item.SEND_TIME  | dateFormat('yyyy-MM-dd hh:mm:ss')}}</div>
+        <div class="content-wishes">
+          <div class="img-wrap">
+            <img :src="item.URL" alt="">
           </div>
+          <div class="first-title">{{item.TWEET_TITLE}}</div>
+          <div class="second-title">{{item.TWEET_CONTENT}}</div>
         </div>
       </div>
     </div>
-    
   </div>
 </template>
 
 <script>
+import utils from './../../common/util'
+import { EmployeeWishHistoryList } from './service'
 export default {
   components: {},
   data() {
     return {
-      list: [{
-        date: '2020-09-12 12:00',
-        list: [1]
-      }]
+      loginUserId: utils.getPara('loginUserId'),
+      list: []
+    }
+  },
+  computed:  {
+    host() {
+      return utils.hostRefect()
     }
   },
   created() {
     this.init()
   },
   methods: {
-    init() {}
+    init() {
+      this.EmployeeWishHistoryList()
+    },
+    async EmployeeWishHistoryList() {
+      try {
+        const {data} = await EmployeeWishHistoryList({loginUserId:this.loginUserId,wishType:'YEAR',sendType:2})
+        if(data && data.ResultCode == 0) {
+          this.list = data.Data
+        }
+      } catch (error) {
+        console.log('EmployeeWishHistoryList接口异常'+error)
+      }
+    }
   }
 }
 </script>
@@ -56,8 +70,12 @@ export default {
     z-index: -1;
     background-color: #F6F6F6;
   }
-  .list-data {
-    .item-data {
+  .list-wishes {
+    .item-wishes {
+      margin-top: 20px;
+      &:first-child {
+        margin: 0;
+      }
       .date {
         display: flex;
         align-items: center;
@@ -68,15 +86,12 @@ export default {
         color: #9A9A9A;
         line-height: 34px;
       }
-      .list-wishes {
-        .item-wishes {
-          margin-top: 40px;
+      .content-wishes {
           width: 100%;
-          height: 452px;
+          padding-bottom: 36px;
           background: #FFFFFF;
           border-radius: 10px;
           overflow: hidden;
-          text-align: center;
           &:first-child {
             margin: 0;
           }
@@ -90,6 +105,7 @@ export default {
           }
           .first-title {
             margin-top: 16px;
+            padding: 0 40px;
             font-size: 32px;
             color: #1F1F1F;
             line-height: 44px;
@@ -97,12 +113,12 @@ export default {
           }
           .second-title {
             margin-top: 25px;
+            padding: 0 40px;
             font-size: 28px;
             color: #888888;
             line-height: 40px;
           }
         }
-      }
     }
   }
 }
