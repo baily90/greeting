@@ -3,14 +3,12 @@
     <div class="bg-page"></div>
     <van-swipe class="my-swipe" ref="swipe" :vertical="true" :show-indicators="false" :loop="false" @change="change">
       <van-swipe-item v-for="(item, index) in list" :key="index">
-        <!-- <div class="backgroundImg" v-lazy:background-image="item.backgroundImg"></div> -->
+        <div class="backgroundImg" v-lazy:background-image="item.backgroundImg"></div>
         <div class="btn-arrow" @click="next">
           滑动解锁更多精彩
           <div class="icon-arrow"></div>
         </div>
-        <div class="copy-content" v-if="item.copy">
-          {{item.copy}}
-        </div>
+        <div class="copy-content" v-if="item.copy" v-html="item.copy"></div>
       </van-swipe-item>
     </van-swipe>
     <!-- 分享弹窗 -->
@@ -58,11 +56,13 @@ export default {
           const COPY_LIST = resData.COPY_LIST // 祝福语
           const CARD_BACKGROUND = resData.CARD_BACKGROUND // 贺卡背景
           const COLLEAGUES_BLESSING_LIST = resData.COLLEAGUES_BLESSING_LIST // 同事祝福
+          const MEDAL_LIST = resData.MEDAL_LIST // 勋章
+          COPY_LIST && COPY_LIST.map(item => {
+            // 处理 | [YEAR] [DAY] [INDATE]
+            item.COPY = item.COPY.replaceAll('|', '<br/>')
+            return item
+          })
           CARD_BACKGROUND  && CARD_BACKGROUND.forEach((blessing, index) =>  {
-            this.list.push({
-              copy: COPY_LIST && COPY_LIST[index] && COPY_LIST[index].COPY,
-              backgroundImg: blessing.URL
-            })
             this.list.push({
               copy: COPY_LIST && COPY_LIST[index] && COPY_LIST[index].COPY,
               backgroundImg: blessing.URL
