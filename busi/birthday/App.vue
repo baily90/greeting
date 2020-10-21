@@ -3,67 +3,151 @@
     <div class="container">
       <div class="birth-background">
         <img src="" alt="" />
-        <div class="name">周兴明 1200191 研发组</div>
-        <div class="date">9月18日生日</div>
+        <div class="name">
+          {{ birthDetail.EMPLOYEE_NAME }} {{ birthDetail.EMPLOYEE_CODE }}
+          {{ birthDetail.DEPARTMENT_NAME }}
+        </div>
+        <div class="date">
+          {{ birthDetail.BIRTHDAY | monthFilter }}月{{
+            birthDetail.BIRTHDAY | dateFilter
+          }}日生日
+        </div>
       </div>
 
       <div class="birth-select">选择礼物</div>
       <div class="birth-gift">
-        <img class="selected" src="" alt="" />
-        <img src="" alt="" />
-        <img src="" alt="" />
-        <img src="" alt="" />
-        <img src="" alt="" />
-        <img src="" alt="" />
-        <img src="" alt="" />
-        <img src="" alt="" />
-        <img src="" alt="" />
+        <img
+          :class="item.IS_CHIOSE ? 'selected' : ''"
+          :src="item.URL"
+          v-for="(item, index) in birthDetail.GIFT"
+          @click="handleSlectGift(item, index)"
+          :key="index"
+        />
         <img class="upload" src="" alt="" />
       </div>
       <div class="birth-fill">
         <span>填写祝福</span>
-        <span class="exchange">换一换</span>
+        <span
+          :class="isHistory == 'true' ? 'exchange greyFont' : 'exchange'"
+          @click="handleExchange"
+          >换一换</span
+        >
       </div>
       <div class="birth-content">
-        <textarea :value="birthContent"></textarea>
+        <textarea
+          :value="birthContent.COPY"
+          readonly="isHistory == 'true'"
+        ></textarea>
       </div>
-      <div class="birth-send">发送祝福</div>
+      <div :class="isHistory == 'true' ? 'birth-send grey' : 'birth-send'">
+        发送祝福
+      </div>
       <div class="birth-refrom">祝福会在同事生日当天发给TA</div>
     </div>
   </div>
 </template>
 
 <script>
-import { PullRefresh } from "vant";
-import util from "../../../common/util";
-import axiosWrap from "../../../common/axiosWrap";
-import apis from "../common/apis";
-import CToast from "../../../components/Toast/Toast";
+import utils from "../../common/util";
+import axiosWrap from "../../common/axiosWrap";
+import apis from "../../common/apis";
+import CToast from "../../components/Toast/Toast";
 export default {
   name: "App",
   data() {
     return {
       isLoading: false,
-      birthContent: "啦啦啦啦啦",
+      birthDetail: {},
+      birthContent: {
+        COPY: "",
+      },
+      //选择的礼物id
+      giftId: "",
+      // 当前选择的祝福内容index
+      birthIndex: -1,
+      loginUserId: utils.getPara("loginUserId"),
+      // 是否是从历史送出的祝福列表进入 是为true否则不是
+      isHistory: utils.getPara("isHistory"),
+      // 祝福id
+      id: utils.getPara("id"),
+      // 祝福类型 YEAR周年，BIRTHDAY生日
+      wishType: utils.getPara("wishType"),
+      UserId: utils.getPara("UserId"),
+      year: utils.getPara("year"),
     };
   },
   components: {
     CToast,
-    [PullRefresh.name]: PullRefresh,
+  },
+  filters: {
+    monthFilter(value) {
+      if (value && value.split(" ")) {
+        return value.split(" ")[0].split("-")[1];
+      }
+    },
+    dateFilter(value) {
+      if (value && value.split(" ")) {
+        return value.split(" ")[0].split("-")[2];
+      }
+    },
   },
   created() {
-    this.test();
+    this.getList();
   },
   methods: {
-    //test
-    test() {
-      const url = apis.getUrls().test;
+    // 选择礼物
+    handleSlectGift(item, index) {
+      if (this.isHistory) {
+        return;
+      }
+      console.log(index, this.giftId);
+      if (!item.IS_CHIOSE) {
+        this.giftId = item.ROW_ID;
+        this.birthDetail.GIFT.forEach((item) => {
+          item.IS_CHIOSE = false;
+        });
+        this.birthDetail.GIFT[index].IS_CHIOSE = true;
+      } else {
+        this.giftId = "";
+        this.birthDetail.GIFT[index].IS_CHIOSE = false;
+      }
+    },
+    // 换一换
+    handleExchange() {
+      if (this.isHistory) {
+        return;
+      }
+      if (this.birthIndex != -1) {
+        if (this.birthIndex + 1 == this.birthDetail.COPY_LIST.length) {
+          this.birthIndex = 0;
+        } else {
+          this.birthIndex++;
+        }
+        this.birthContent = this.birthDetail.COPY_LIST[this.birthIndex];
+      }
+    },
+    //getList
+    getList() {
+      const url = apis.getUrls().EmployeeWish;
+      const params = {
+        id: this.id,
+        wishType: this.wishType,
+        UserId: this.UserId,
+        year: this.year,
+      };
       axiosWrap
-        .post(url, {})
-        .then((result) => {
-          console.log(result);
+        .get(url, { params })
+        .then(({ data }) => {
+          if (data && data.ResultCode == 0) {
+            this.birthDetail = data.Data;
+            this.birthIndex = 0;
+            this.birthContent = this.birthDetail.COPY_LIST[this.birthIndex];
+            console.log(this.birthDetail);
+          }
         })
         .catch((err) => {
+          this.isLoading = false;
+          this.firstRenderComplete = true;
           console.error(err);
         });
     },
@@ -71,7 +155,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "../style/mixins";
+@import "./mixins";
 
 #app {
   background: #fdf5ee;
@@ -83,10 +167,16 @@ export default {
   padding: 20px;
   border-radius: 10px;
 }
+.grey {
+  background: #d2d2d2 !important;
+}
+.greyFont {
+  color: #d2d2d2 !important;
+}
 .birth-background {
-  background: url("../common/birthday.png") no-repeat;
-  background-size: 100%;
   height: 390px;
+  background: url("./assets/birthday.png") no-repeat;
+  background-size: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -131,9 +221,9 @@ export default {
 .birth-gift .selected {
   width: calc(25% - 42px);
   border: 4px solid #ff592f;
-  background: url("../common/selected.png") no-repeat;
-  background-position-x: 63px;
-  background-position-y: -8px;
+  background: url("./assets/selected.png") no-repeat;
+  background-position-x: 54px;
+  background-position-y: -4px;
   box-sizing: border-box;
 }
 .birth-gift img:nth-child(5n) {

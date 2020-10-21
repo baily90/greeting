@@ -20,6 +20,8 @@ export default {
       EmployeeWishHistoryList: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishHistoryList`,
       // 贺卡
       EmployeeWishByCompany: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishByCompany`,
+      // 祝福详情
+      EmployeeWish: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWish`,
     }
   },
 

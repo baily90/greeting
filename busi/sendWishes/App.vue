@@ -22,7 +22,12 @@
         @load="getList"
         :immediate-check="false"
       >
-        <div class="item" v-for="(item, index) in historyList" :key="index">
+        <div
+          class="item"
+          v-for="(item, index) in historyList"
+          :key="index"
+          @click="gotoDetail(item)"
+        >
           <div class="name">
             <span>{{ item.EMPLOYEE_NAME }}</span>
             <span
@@ -74,6 +79,9 @@ export default {
       this.type = type;
       this.pageNum = 1;
       this.getList();
+    },
+    gotoDetail(item) {
+      location.href = `/birthday?loginUserId=${this.loginUserId}&UserId=${item.EMPLOYEE_ID}&id=${item.ROW_ID}&year=${item.YEAR_COUNT}&wishType=${this.type}&isHistory=true`;
     },
     // 历史送出的祝福
     getList() {
