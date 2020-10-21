@@ -19,7 +19,7 @@ export default {
       // 历史收到的祝福
       EmployeeWishHistoryList: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishHistoryList`,
       // 贺卡
-      EmployeeWishByCompany: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishByCompany`
+      EmployeeWishByCompany: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishByCompany`,
     }
   },
 
