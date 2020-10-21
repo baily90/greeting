@@ -1,10 +1,10 @@
 <template>
   <div class="container-birthdayCard">
     <div class="bg-page"></div>
-    <van-swipe class="my-swipe" :vertical="true" :show-indicators="false" :loop="false">
+    <van-swipe class="my-swipe" ref="swipe" :vertical="true" :show-indicators="false" :loop="false" @change="change">
       <van-swipe-item v-for="(item, index) in list" :key="index">
-        <img class="img-bg" v-lazy="item.backgroundImg" alt="">
-        <div class="btn-arrow">
+        <!-- <div class="backgroundImg" v-lazy:background-image="item.backgroundImg"></div> -->
+        <div class="btn-arrow" @click="next">
           滑动解锁更多精彩
           <div class="icon-arrow"></div>
         </div>
@@ -13,15 +13,19 @@
         </div>
       </van-swipe-item>
     </van-swipe>
+    <!-- 分享弹窗 -->
+    <Share :isShow="isShowShareDialog"></Share>
   </div>
 </template>
 
 <script>
 import { Swipe, SwipeItem } from 'vant'
+import Share from './../../components/Share'
 import { EmployeeWishByCompany } from './service'
 import utils from './../../common/util'
 export default {
   components: {
+    Share,
     [Swipe.name]:  Swipe,
     [SwipeItem.name]: SwipeItem
   },
@@ -30,7 +34,8 @@ export default {
       id: utils.getPara('id'),
       UserId: utils.getPara('UserId'),
       wishType: utils.getPara('wishType'),
-      list: []
+      list: [],
+      isShowShareDialog: false
     }
   },
   computed:  {
@@ -58,6 +63,10 @@ export default {
               copy: COPY_LIST && COPY_LIST[index] && COPY_LIST[index].COPY,
               backgroundImg: blessing.URL
             })
+            this.list.push({
+              copy: COPY_LIST && COPY_LIST[index] && COPY_LIST[index].COPY,
+              backgroundImg: blessing.URL
+            })
           })
           COLLEAGUES_BLESSING_LIST  && COLLEAGUES_BLESSING_LIST.forEach(blessing =>  {
             this.list.push({
@@ -68,6 +77,12 @@ export default {
       } catch (error) {
         console.log('FocusList接口异常'+error)
       }
+    },
+    change(index) {
+      console.log(index)
+    },
+    next() {
+      this.$refs.swipe.next()
     }
   }
 }
@@ -91,9 +106,12 @@ export default {
   }
   .my-swipe {
     height: 100vh;
-    .img-bg {
+    .backgroundImg {
       width: 100%;
       height: 100%;
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
     }
     .btn-arrow {
       position: absolute;
@@ -102,18 +120,18 @@ export default {
       margin-left: -116px;
       width: 232px;
       font-size: 28px;
-      color: #fff;
+      color: #5e678b;
       text-align: center;
       line-height: 50px;
       .icon-arrow {
         position: absolute;
-        bottom: -28px;
+        bottom: -10px;
         left: 50%;
-        margin-left: -17px;
-        width: 34px;
-        height: 15px;
-        background: url(./assets/icon-arrow.png) no-repeat center center;
-        background-size: cover;
+        width: 20px;
+        height: 20px;
+        border-left: 1px solid #5e678b;
+        border-bottom: 1px solid #5e678b;
+        transform: rotate(-45deg) translateX(-50%);
         animation: arrow .6s ease-in-out infinite alternate;
       }
     }
@@ -134,7 +152,7 @@ export default {
 }
 @keyframes arrow {
   100% {
-    bottom: -50px;
+    bottom: -30px;
   }
 }
 </style>
