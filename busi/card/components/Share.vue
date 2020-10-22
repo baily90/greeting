@@ -12,11 +12,11 @@
       </div>
     </div>
     <div class="btn-area" @click.stop>
-      <div class="saveImg" @click="save">
+      <div class="saveImg" @click="posterHandler('save')">
         <img class="icon icon-saveImg" src="./../assets/icon-saveImg.png" alt="">
         <span class="label">保存图片</span>
       </div>
-      <div class="wechat" @click="share">
+      <div class="wechat" @click="posterHandler('share')">
         <img class="icon icon-wechat" src="./../assets/icon-wechat.png" alt="">
         <span class="label">分享微信</span>
       </div>
@@ -57,16 +57,20 @@ export default {
     }
   },
   methods: {
-    save() {
-      alert('save')
+    posterHandler(type) {
+      console.log(type)
+      this.EmployeeCareUploadFile(type)
     },
-    share() {
-      this.EmployeeCareUploadFile()
-    },
-    async EmployeeCareUploadFile() {
-      const canvas = await html2canvas(this.$refs.poster)
-      const resData = await EmployeeCareUploadFile({file:canvas.toDataURL(),file_name:`poster_${this.wishType}`})
-      console.log(resData)
+    async EmployeeCareUploadFile(type) {
+      const canvas = await html2canvas(this.$refs.poster, {allowTaint: true,useCORS: true,backgroundColor: "transparent" })
+      let base64Url = canvas.toDataURL('image/png')
+      base64Url = base64Url.substring(base64Url.indexOf('base64,')+7,base64Url.length)
+      const requestData = {file:base64Url,file_name:`poster_${this.wishType}.png`}
+      const {data} = await EmployeeCareUploadFile(requestData)
+      if(data && data.ResultCode == 0) {
+        const imgUrl = data.Data
+        console.log(imgUrl)
+      }
     },
     overlayAutoClose () {
       this.$emit('update:isShow', false)
