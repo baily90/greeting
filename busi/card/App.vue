@@ -24,13 +24,13 @@
       </van-swipe-item>
     </van-swipe>
     <!-- 分享弹窗 -->
-    <Share :isShow.sync="isShowShareDialog"></Share>
+    <Share :isShow.sync="isShowShareDialog" :wishType="wishType"></Share>
   </div>
 </template>
 
 <script>
 import { Swipe, SwipeItem } from 'vant'
-import Share from './../../components/Share'
+import Share from './components/Share'
 import { EmployeeWishByCompany } from './service'
 import utils from './../../common/util'
 export default {
@@ -45,7 +45,7 @@ export default {
       UserId: utils.getPara('UserId'),
       wishType: utils.getPara('wishType'),
       list: [],
-      isShowShareDialog: false
+      isShowShareDialog: true
     }
   },
   computed:  {

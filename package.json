@@ -40,7 +40,8 @@
     "karma-webpack": "^2.0.2",
     "postcss-pxtorem": "^5.1.1",
     "style-loader": "^1.0.0",
-    "webpack-cli": "^3.3.9"
+    "webpack-cli": "^3.3.9",
+    "html2canvas": "^1.0.0-rc.5"
   },
   "engines": {
     "node": ">= 4.0.0",

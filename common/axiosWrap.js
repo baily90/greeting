@@ -23,17 +23,21 @@ Axios.interceptors.request.use(config => {
         'Pragma': 'no-cache',
         // 'wx_token': window.localStorage.getItem('wx_token')
     }
-    if(config.method == 'get') {
-        config.params = {
-            ...config.params,
-            MOC_Token: "406b66f355a54ece97ea6171257fbd5a"
-        }
-    }else {
-        config.data = {
-            ...config.data,
-            MOC_Token: "406b66f355a54ece97ea6171257fbd5a"
-        }
+    config.params = {
+        ...config.params,
+        MOC_Token: "406b66f355a54ece97ea6171257fbd5a"
     }
+    // if(config.method == 'get') {
+    //     config.params = {
+    //         ...config.params,
+    //         MOC_Token: "406b66f355a54ece97ea6171257fbd5a"
+    //     }
+    // }else {
+    //     config.data = {
+    //         ...config.data,
+    //         MOC_Token: "406b66f355a54ece97ea6171257fbd5a"
+    //     }
+    // }
     
     // 判断参数，展示loading动画
     if (callStack.length === 0) {
