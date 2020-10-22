@@ -24,6 +24,8 @@ export default {
       EmployeeWish: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWish`,
       // 上传图片
       EmployeeCareUploadFile: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeCareUploadFile`,
+      // 发送祝福
+      SavaEmployeeWish: `${hostname}/hrapi/api/MocApiGeneralV2/SavaEmployeeWish`
     }
   },
 

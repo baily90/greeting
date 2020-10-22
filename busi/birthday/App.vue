@@ -1,8 +1,14 @@
 <template>
   <div id="app">
     <div class="container">
-      <div class="birth-background">
-        <img src="" alt="" />
+      <div
+        :class="
+          wishType == 'YEAR'
+            ? 'birth-background year-background'
+            : 'birth-background'
+        "
+      >
+        <img :src="birthDetail.ICON" alt="" />
         <div class="name">
           {{ birthDetail.EMPLOYEE_NAME }} {{ birthDetail.EMPLOYEE_CODE }}
           {{ birthDetail.DEPARTMENT_NAME }}
@@ -23,23 +29,35 @@
           @click="handleSlectGift(item, index)"
           :key="index"
         />
-        <img class="upload" src="" alt="" />
+        <div class="uploadContain">
+          <img
+            class="upload"
+            :src="uploadGift"
+            alt=""
+            :style="{ border: uploadGift ? 'none' : '' }"
+          />
+          <input
+            v-if="!isHistory && !uploadGift"
+            type="file"
+            @change="handleUpload($event)"
+          />
+        </div>
       </div>
       <div class="birth-fill">
         <span>填写祝福</span>
         <span
-          :class="isHistory == 'true' ? 'exchange greyFont' : 'exchange'"
+          :class="isHistory ? 'exchange greyFont' : 'exchange'"
           @click="handleExchange"
           >换一换</span
         >
       </div>
       <div class="birth-content">
-        <textarea
-          :value="birthContent.COPY"
-          readonly="isHistory == 'true'"
-        ></textarea>
+        <textarea v-model="birthContent.COPY" :readonly="isHistory"></textarea>
       </div>
-      <div :class="isHistory == 'true' ? 'birth-send grey' : 'birth-send'">
+      <div
+        :class="isHistory ? 'birth-send grey' : 'birth-send'"
+        @click="sendWishes()"
+      >
         发送祝福
       </div>
       <div class="birth-refrom">祝福会在同事生日当天发给TA</div>
@@ -52,6 +70,7 @@ import utils from "../../common/util";
 import axiosWrap from "../../common/axiosWrap";
 import apis from "../../common/apis";
 import CToast from "../../components/Toast/Toast";
+import { Field, Toast } from "vant";
 export default {
   name: "App",
   data() {
@@ -61,13 +80,17 @@ export default {
       birthContent: {
         COPY: "",
       },
+      //上传的图片
+      uploadGift: "",
+      //上传后接口返回的url
+      uploadImg: "",
       //选择的礼物id
       giftId: "",
       // 当前选择的祝福内容index
       birthIndex: -1,
       loginUserId: utils.getPara("loginUserId"),
       // 是否是从历史送出的祝福列表进入 是为true否则不是
-      isHistory: utils.getPara("isHistory"),
+      isHistory: utils.getPara("isHistory") == "true",
       // 祝福id
       id: utils.getPara("id"),
       // 祝福类型 YEAR周年，BIRTHDAY生日
@@ -95,6 +118,81 @@ export default {
     this.getList();
   },
   methods: {
+    sendWishes() {
+      if (this.isHistory) {
+        return;
+      }
+      const url = apis.getUrls().SavaEmployeeWish;
+      const params = {
+        loginUserId: this.loginUserId,
+        userId: this.UserId,
+        gift: this.giftId,
+        blessingContent: this.birthContent.COPY,
+        tweetImg: "",
+        cardBackground: this.birthDetail.CARD_BACKGROUND[0].url,
+        careSetupId: this.birthDetail.CARE_SETUP_ID,
+        icon: this.birthDetail.ICON,
+        uploadGift: this.uploadGift,
+      };
+      axiosWrap
+        .post(url, params)
+        .then(({ data }) => {
+          if (data && data.ResultCode == 0) {
+            Toast("发送成功");
+            console.log(data);
+          } else {
+            Toast("发送失败");
+          }
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          console.error(err);
+        });
+    },
+    // 上传礼物
+    handleUpload(e) {
+      if (this.isHistory) {
+        return;
+      }
+      if (!window.FileReader) return;
+      var files = e.target.files;
+      for (var i = 0, f; (f = files[i]); i++) {
+        var reader = new FileReader();
+        reader.onload = (() => {
+          return (e) => {
+            console.log(e, files[0]);
+            this.uploadGift = e.target.result;
+            this.requertUpload(
+              this.uploadGift.substring(
+                this.uploadGift.indexOf("base64,") + 7,
+                this.uploadGift.length
+              ),
+              files[0].name
+            );
+          };
+        })(f);
+        reader.readAsDataURL(f);
+      }
+    },
+    requertUpload(file, file_name) {
+      const url = apis.getUrls().EmployeeCareUploadFile;
+      const params = {
+        file,
+        file_name,
+      };
+      axiosWrap
+        .post(url, params)
+        .then(({ data }) => {
+          if (data && data.ResultCode == 0) {
+            this.uploadImg = data.Data;
+            console.log(data);
+          }
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          console.error(err);
+        });
+    },
     // 选择礼物
     handleSlectGift(item, index) {
       if (this.isHistory) {
@@ -147,7 +245,6 @@ export default {
         })
         .catch((err) => {
           this.isLoading = false;
-          this.firstRenderComplete = true;
           console.error(err);
         });
     },
@@ -170,11 +267,11 @@ export default {
 .grey {
   background: #d2d2d2 !important;
 }
-.greyFont {
-  color: #d2d2d2 !important;
+.year-background {
+  background: url("./assets/year.png") no-repeat !important;
 }
 .birth-background {
-  height: 390px;
+  height: 400px;
   background: url("./assets/birthday.png") no-repeat;
   background-size: 100%;
   display: flex;
@@ -218,6 +315,21 @@ export default {
   margin-bottom: 20px;
   position: relative;
 }
+.uploadContain {
+  width: calc(25% - 42px);
+  height: 112px;
+  background: #f9f6f4;
+  border-radius: 10px;
+  margin-right: 10px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.birth-gift input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+}
 .birth-gift .selected {
   width: calc(25% - 42px);
   border: 4px solid #ff592f;
@@ -234,6 +346,8 @@ export default {
   background: #ffffff;
   position: relative;
   box-sizing: border-box;
+  position: absolute;
+  width: 100%;
 }
 .birth-gift .upload::after {
   content: "";
@@ -265,6 +379,31 @@ export default {
 .birth-fill .exchange {
   font-size: 24px;
   color: #f58a56;
+  position: relative;
+  width: 18%;
+  text-align: right;
+}
+
+.greyFont {
+  color: #d2d2d2 !important;
+}
+.greyFont::before {
+  content: "";
+  position: absolute;
+  background: url("./assets/refresh-grey.png") no-repeat !important;
+  width: 28px;
+  height: 28px;
+  left: 0;
+  top: 2px;
+}
+.birth-fill .exchange::before {
+  content: "";
+  position: absolute;
+  background: url("./assets/refresh.png") no-repeat;
+  width: 28px;
+  height: 28px;
+  left: 0;
+  top: 2px;
 }
 .birth-content {
   margin: 0 20px;
