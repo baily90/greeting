@@ -2,17 +2,29 @@
   <div class="container-birthdayCard">
     <div class="bg-page"></div>
     <van-swipe class="my-swipe" ref="swipe" :vertical="true" :show-indicators="false" :loop="false" @change="change">
-      <van-swipe-item v-for="(item, index) in list" :key="index">
+      <van-swipe-item v-for="(item, index) in list" :key="index" :class="{'year':wishType=='YEAR', 'birthday':wishType=='BIRTHDAY'}">
+        <!-- 贺卡当前页背景图片 -->
         <div class="backgroundImg" v-lazy:background-image="item.backgroundImg"></div>
-        <div class="btn-arrow" :class="{'year':wishType=='YEAR', 'birthday':wishType=='BIRTHDAY'}" @click="next">
+        <!-- 贺卡底部下滑动画 -->
+        <div class="btn-arrow" v-if="index != list.length-1" @click="next">
           滑动解锁更多精彩
           <div class="icon-arrow"></div>
         </div>
-        <div class="copy-content" v-if="item.copy" v-html="item.copy"></div>
+        <!-- 贺卡祝福文案 -->
+        <div class="copy-content" v-if="item.type == 'card' && item.copy" v-html="item.copy"></div>
+        <!-- 同事祝福 -->
+        <div class="wishes-content" v-if="item.type=='wish' && item.copy">
+          <div class="name"><span>{{item.copy.EMPLOYEE_NAME}}</span>送上祝福:</div>
+          <div class="wish" v-html="item.copy.BLESSING_CONTENT"></div>
+          <div class="gift">
+            <img :src="item.copy.GIFT" alt="">
+          </div>
+          <div class="btn-share" v-if="item.isLastPage" @click="toggleShowShareDialog">炫耀一下</div>
+        </div>
       </van-swipe-item>
     </van-swipe>
     <!-- 分享弹窗 -->
-    <Share :isShow="isShowShareDialog"></Share>
+    <Share :isShow.sync="isShowShareDialog"></Share>
   </div>
 </template>
 
@@ -77,19 +89,27 @@ export default {
           })
           CARD_BACKGROUND  && CARD_BACKGROUND.forEach((blessing, index) =>  {
             this.list.push({
+              type: 'card',
               copy: COPY_LIST && COPY_LIST[index] && COPY_LIST[index].COPY,
               backgroundImg: blessing.URL
             })
           })
-          COLLEAGUES_BLESSING_LIST  && COLLEAGUES_BLESSING_LIST.forEach(blessing =>  {
+          COLLEAGUES_BLESSING_LIST  && COLLEAGUES_BLESSING_LIST.forEach((blessing, index) =>  {
+            blessing.BLESSING_CONTENT = blessing.BLESSING_CONTENT.replaceAll('|', '<br/>')
             this.list.push({
-              backgroundImg: blessing.CARD_BACKGROUND
+              type: 'wish',
+              copy: blessing,
+              backgroundImg: blessing.CARD_BACKGROUND,
+              isLastPage: index === COLLEAGUES_BLESSING_LIST.length-1
             })
           })
         }
       } catch (error) {
         console.log('FocusList接口异常'+error)
       }
+    },
+    toggleShowShareDialog() {
+      this.isShowShareDialog = !this.isShowShareDialog
     },
     change(index) {
       console.log(index)
@@ -144,20 +164,6 @@ export default {
         transform: rotate(-45deg) translateX(-50%);
         animation: arrow .6s ease-in-out infinite alternate;
       }
-      &.year {
-        color: #fff;
-        .icon-arrow {
-          border-left: 1px solid #fff;
-          border-bottom: 1px solid #fff;
-        }
-      }
-      &.birthday {
-        color: #5e678b;
-        .icon-arrow {
-          border-left: 1px solid #5e678b;
-          border-bottom: 1px solid #5e678b;
-        }
-      }
     }
     .copy-content {
       position: absolute;
@@ -166,13 +172,90 @@ export default {
       width: 420px;
       padding: 26px 32px 24px 26px;
       font-size: 24px;
-      color: #762400;
       line-height: 48px;
       background: rgba(255,255,255,.9);
       box-shadow: 0px 4px 12px rgba(191, 107, 107, 0.16);
     }
+    .wishes-content {
+      position: absolute;
+      top: 48px;
+      left: 56px;
+      width: 640px;
+      height: 1130px;
+      padding: 38px 58px;
+      background: rgba(255,255,255,.7);
+      border: 10px;
+      .name {
+        display: flex;
+        align-items: flex-end;
+        width: 100%;
+        font-size: 28px;
+        span {
+          font-size: 48px;
+          font-weight: bolder;
+        }
+      }
+      .wish {
+        margin-top: 24px;
+        font-size: 28px;
+      }
+      .gift {
+        display: flex;
+        justify-content: center;
+        margin-top: 102px;
+        width: 100%;
+        height: 100%;
+        img {
+          width: 440px;
+          height: 440px;
+        }
+      }
+      .btn-share {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        bottom: 58px;
+        left: 152px;
+        width: 336px;
+        height: 88px;
+        background: #FF8A41;
+        font-size: 36px;
+        color: #fff;
+      }
+    }
   }
-  
+
+  .year {
+    .btn-arrow {
+      color: #fff;
+      .icon-arrow {
+        border-left: 1px solid #fff;
+        border-bottom: 1px solid #fff;
+      }
+    }
+    .copy-content {
+      color: #005683;
+    }
+    .wishes-content {
+      color: #005683;
+    }
+  }
+  .birthday {
+    .btn-arrow {
+      color: #5e678b;
+      .icon-arrow {
+        border-left: 1px solid #5e678b;
+        border-bottom: 1px solid #5e678b;
+      }
+    }
+    .copy-content {
+      color: #762400;
+    }
+    .wishes-content {
+      color: #E29C55;
+    }
+  }
 }
 @keyframes arrow {
   100% {

@@ -1,9 +1,9 @@
 <template>
-  <van-overlay :show="isShow" class-name="overLay">
-    <div class="img-area">
+  <van-overlay :show="show" class-name="overLay" :lock-scroll="false" @click="overlayAutoClose">>
+    <div class="img-area" @click.stop>
       <!-- <img src="./assets/icon.png" width="100%" height="100%" alt=""> -->
     </div>
-    <div class="btn-area">
+    <div class="btn-area" @click.stop>
       <div class="saveImg" @click="save">
         <img class="icon icon-saveImg" src="./assets/icon-saveImg.png" alt="">
         <span class="label">保存图片</span>
@@ -30,7 +30,16 @@ export default {
   },
   data () {
     return {
-      
+      show: false
+    }
+  },
+  created() {
+    this.show =  this.isShow
+  },
+  watch: {
+    isShow (val) {
+      this.show = val
+      this.$emit('update:isShow', val)
     }
   },
   methods: {
@@ -39,6 +48,9 @@ export default {
     },
     share() {
       alert('share')
+    },
+    overlayAutoClose () {
+      this.$emit('update:isShow', false)
     }
   }
 }
