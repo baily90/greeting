@@ -4,7 +4,7 @@
     <van-swipe class="my-swipe" ref="swipe" :vertical="true" :show-indicators="false" :loop="false" @change="change">
       <van-swipe-item v-for="(item, index) in list" :key="index">
         <div class="backgroundImg" v-lazy:background-image="item.backgroundImg"></div>
-        <div class="btn-arrow" @click="next">
+        <div class="btn-arrow" :class="{'year':wishType=='YEAR', 'birthday':wishType=='BIRTHDAY'}" @click="next">
           滑动解锁更多精彩
           <div class="icon-arrow"></div>
         </div>
@@ -57,9 +57,22 @@ export default {
           const CARD_BACKGROUND = resData.CARD_BACKGROUND // 贺卡背景
           const COLLEAGUES_BLESSING_LIST = resData.COLLEAGUES_BLESSING_LIST // 同事祝福
           const MEDAL_LIST = resData.MEDAL_LIST // 勋章
+          const YEAR_COUNT = resData.YEAR_COUNT // 工龄-年
+          const DAY_COUNT = resData.DAY_COUNT // 工龄-日
+          const INDATE = resData.INDATE // 入职日期
+
+          let medal = '<div style="display:flex;flex-wrap:wrap;width:100%">'
+          MEDAL_LIST && MEDAL_LIST.forEach((item, index) => {
+            medal += `<img style="margin-top:0.16rem;margin-right:0.16rem;width:1.33rem;height:1.33rem" src="${item.medal_url}">`
+          })
+          medal += `</div>`
           COPY_LIST && COPY_LIST.map(item => {
-            // 处理 | [YEAR] [DAY] [INDATE]
+            // 处理 | [YEAR] [DAY] [INDATE] [MEDALLIST]
             item.COPY = item.COPY.replaceAll('|', '<br/>')
+              .replaceAll('[YEAR]', YEAR_COUNT)
+              .replaceAll('[DAY]', DAY_COUNT)
+              .replaceAll('[INDATE]', INDATE)
+              .replaceAll('[MEDALLIST]', medal)
             return item
           })
           CARD_BACKGROUND  && CARD_BACKGROUND.forEach((blessing, index) =>  {
@@ -120,7 +133,6 @@ export default {
       margin-left: -116px;
       width: 232px;
       font-size: 28px;
-      color: #5e678b;
       text-align: center;
       line-height: 50px;
       .icon-arrow {
@@ -129,10 +141,22 @@ export default {
         left: 50%;
         width: 20px;
         height: 20px;
-        border-left: 1px solid #5e678b;
-        border-bottom: 1px solid #5e678b;
         transform: rotate(-45deg) translateX(-50%);
         animation: arrow .6s ease-in-out infinite alternate;
+      }
+      &.year {
+        color: #fff;
+        .icon-arrow {
+          border-left: 1px solid #fff;
+          border-bottom: 1px solid #fff;
+        }
+      }
+      &.birthday {
+        color: #5e678b;
+        .icon-arrow {
+          border-left: 1px solid #5e678b;
+          border-bottom: 1px solid #5e678b;
+        }
       }
     }
     .copy-content {

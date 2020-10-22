@@ -50,11 +50,7 @@ export default {
       }
     },
     go2Card(obj) {
-      if(obj.WISH_TYPE == 'YEAR') {
-        location.href = `${this.host}/birthdayCard?id=${obj.ROW_ID}&UserId=${obj.EMPLOYEE_ID}&wishType=${obj.WISH_TYPE}`
-      }else {
-        location.href = `${this.host}/birthdayCard?id=${obj.ROW_ID}&UserId=${obj.EMPLOYEE_ID}&wishType=${obj.WISH_TYPE}`
-      }
+      location.href = `${this.host}/card?id=${obj.ROW_ID}&UserId=${obj.EMPLOYEE_ID}&wishType=${obj.WISH_TYPE}`
     }
   }
 }
