@@ -42,8 +42,6 @@ export default {
   data() {
     return {
       id: utils.getPara('id'),
-      UserId: utils.getPara('UserId'),
-      wishType: utils.getPara('wishType'),
       shareInfo: {},
       list: [],
       isShowShareDialog: false
@@ -63,7 +61,7 @@ export default {
     },
     async EmployeeWishByCompany () {
       try {
-        const {data} = await EmployeeWishByCompany({id:this.id,UserId:this.UserId,wishType:this.wishType})
+        const {data} = await EmployeeWishByCompany({id:this.id})
         if(data && data.ResultCode == 0) {
           const resData = data.Data
           const COPY_LIST = resData.COPY_LIST // 祝福语
@@ -75,6 +73,7 @@ export default {
           const INDATE = resData.INDATE // 入职日期
           const RECEIVER_NAME = resData.RECEIVER_NAME // 接受者姓名
           const shareInfo = resData.shareInfo // 分享信息
+          this.wishType = resData.WISH_TYPE  //贺卡类别
 
           // 分享信息处理
           if(shareInfo && shareInfo.COPY) {
