@@ -1,5 +1,5 @@
 <template>
-  <van-overlay :show="show" class-name="overLay" :lock-scroll="false" @click="overlayAutoClose">>
+  <van-overlay :show="show" class-name="overLay" :lock-scroll="false" @click="overlayAutoClose">
     <div class="img-area" :class="{'year':wishType=='YEAR', 'birthday':wishType=='BIRTHDAY'}" ref="poster" @click.stop>
       <img :src="share.URL" width="100%" height="100%" alt="">
       <div class="content-wrap">
@@ -94,8 +94,8 @@ export default {
     top: 68px;
     left: 80px;
     width: 590px;
-    height: 990px;
-    background: #ffffff;
+    height: 890px;
+    background: #efefef;
     border-radius: 20px;
     .content-wrap {
       position: absolute;
