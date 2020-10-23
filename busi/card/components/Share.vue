@@ -1,13 +1,12 @@
 <template>
   <van-overlay :show="show" class-name="overLay" :lock-scroll="false" @click="overlayAutoClose">>
     <div class="img-area" :class="{'year':wishType=='YEAR', 'birthday':wishType=='BIRTHDAY'}" ref="poster" @click.stop>
-      <img v-if="wishType == 'YEAR'" src="./../assets/icon-bg-year.png" width="100%" height="100%" alt="">
-      <img v-if="wishType == 'BIRTHDAY'" src="./../assets/icon-bg-birthday.png" width="100%" height="100%" alt="">
+      <img :src="share.URL" width="100%" height="100%" alt="">
       <div class="content-wrap">
-        <div class="content">
-          <div class="name">亲爱的xxx</div>
+        <div class="content" v-html="share.COPY">
+          <!-- <div class="name">亲爱的xxx</div>
           <div class="wish">生日快乐</div>
-          <div class="value">框架哎开始将大幅和 挨家考了多少分</div>
+          <div class="value">框架哎开始将大幅和 挨家考了多少分</div> -->
         </div>
       </div>
     </div>
@@ -37,6 +36,12 @@ export default {
       type: Boolean,
       default: false
     },
+    share: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
     wishType: {
       type: String,
       default: ''
@@ -58,7 +63,6 @@ export default {
   },
   methods: {
     posterHandler(type) {
-      console.log(type)
       this.EmployeeCareUploadFile(type)
     },
     async EmployeeCareUploadFile(type) {

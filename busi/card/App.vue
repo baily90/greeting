@@ -24,7 +24,7 @@
       </van-swipe-item>
     </van-swipe>
     <!-- 分享弹窗 -->
-    <Share :isShow.sync="isShowShareDialog" :wishType="wishType"></Share>
+    <Share :isShow.sync="isShowShareDialog" :share="shareInfo" :wishType="wishType"></Share>
   </div>
 </template>
 
@@ -44,8 +44,9 @@ export default {
       id: utils.getPara('id'),
       UserId: utils.getPara('UserId'),
       wishType: utils.getPara('wishType'),
+      shareInfo: {},
       list: [],
-      isShowShareDialog: true
+      isShowShareDialog: false
     }
   },
   computed:  {
@@ -72,12 +73,23 @@ export default {
           const YEAR_COUNT = resData.YEAR_COUNT // 工龄-年
           const DAY_COUNT = resData.DAY_COUNT // 工龄-日
           const INDATE = resData.INDATE // 入职日期
+          const RECEIVER_NAME = resData.RECEIVER_NAME // 接受者姓名
+          const shareInfo = resData.shareInfo // 分享信息
 
+          // 分享信息处理
+          if(shareInfo && shareInfo.COPY) {
+            shareInfo.COPY = shareInfo.COPY.replaceAll('|', '<br/>').replaceAll('[NAME]', RECEIVER_NAME)
+          }
+          this.shareInfo = shareInfo
+
+          // 勋章处理
           let medal = '<div style="display:flex;flex-wrap:wrap;width:100%">'
           MEDAL_LIST && MEDAL_LIST.forEach((item, index) => {
             medal += `<img style="margin-top:0.16rem;margin-right:0.16rem;width:1.33rem;height:1.33rem" src="${item.medal_url}">`
           })
           medal += `</div>`
+
+          // 祝福处理
           COPY_LIST && COPY_LIST.map(item => {
             // 处理 | [YEAR] [DAY] [INDATE] [MEDALLIST]
             item.COPY = item.COPY.replaceAll('|', '<br/>')
@@ -112,7 +124,7 @@ export default {
       this.isShowShareDialog = !this.isShowShareDialog
     },
     change(index) {
-      console.log(index)
+      
     },
     next() {
       this.$refs.swipe.next()
