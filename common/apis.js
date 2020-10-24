@@ -1,6 +1,6 @@
 
 const { NODE_ENV } = process.env
-const hostname = NODE_ENV === 'production' ? 'http://moa.qa.17u.cn/moahr' : '/moahr'
+const hostname = NODE_ENV === 'production' ? 'http://moa.qa.17u.cn/' : ''
 
 export default {
   /**
@@ -14,17 +14,17 @@ export default {
   getUrls() {
     return {
       // 我的关注
-      FocusList: `${hostname}/MocApiGeneralV2/FocusList`,
+      FocusList: `${hostname}/moahr/EmployeeCareWX/FocusList`,
       // 关注、取消关注
-      UpdateStatus: `${hostname}/MocApiGeneralV2/UpdateStatus`,
+      UpdateStatus: `${hostname}/moahr/EmployeeCareWX/UpdateStatus`,
       // 历史收到的祝福
-      EmployeeWishHistoryList: `${hostname}/MocApiGeneralV2/EmployeeWishHistoryList`,
+      EmployeeWishHistoryList: `${hostname}/moahr/EmployeeCareWX/EmployeeWishHistoryList`,
       // 贺卡
-      EmployeeWishByCompany: `${hostname}/MocApiGeneralV2/EmployeeWishByCompany`,
+      EmployeeWishByCompany: `${hostname}/moahr/EmployeeCareWX/EmployeeWishByCompany`,
       // 祝福详情
-      EmployeeWish: `${hostname}/MocApiGeneralV2/EmployeeWish`,
+      EmployeeWish: `${hostname}/moahr/EmployeeCareWX/EmployeeWish`,
       // 上传图片
-      EmployeeCareUploadFile: `${hostname}/MocApiGeneralV2/EmployeeCareUploadFile`,
+      EmployeeCareUploadFile: `${hostname}/moahr/EmployeeCareWX/EmployeeCareUploadFile`,
     }
   },
 
