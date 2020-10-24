@@ -61,6 +61,11 @@ export default {
       loginUserId: utils.getPara("loginUserId"),
     };
   },
+  computed:  {
+    host() {
+      return utils.hostRefect()
+    }
+  },
   filters: {
     dateFormat(value) {
       return value.split("T")[0];
@@ -81,7 +86,7 @@ export default {
       this.getList();
     },
     gotoDetail(item) {
-      location.href = `/birthday?loginUserId=${this.loginUserId}&UserId=${item.EMPLOYEE_ID}&id=${item.ROW_ID}&year=${item.YEAR_COUNT}&wishType=${this.type}&isHistory=true`;
+      location.href = `${this.host}/birthday?loginUserId=${this.loginUserId}&UserId=${item.EMPLOYEE_ID}&id=${item.ROW_ID}&year=${item.YEAR_COUNT}&wishType=${this.type}&isHistory=true`;
     },
     // 历史送出的祝福
     getList() {
