@@ -23,6 +23,14 @@
         </div>
       </van-swipe-item>
     </van-swipe>
+    <!-- 合成分享图片 -->
+    <div id="share-poster" :class="{'year':wishType=='YEAR', 'birthday':wishType=='BIRTHDAY'}" ref="poster" @click.stop>
+      <img :src="shareInfo.URL" width="100%" height="100%" alt="">
+      <div class="content-wrap">
+        <div class="content" v-html="shareInfo.COPY">
+        </div>
+      </div>
+    </div>
     <!-- 分享弹窗 -->
     <Share :isShow.sync="isShowShareDialog" :share="shareInfo" :wishType="wishType"></Share>
   </div>
@@ -234,6 +242,62 @@ export default {
         background: #FF8A41;
         font-size: 36px;
         color: #fff;
+      }
+    }
+  }
+
+  #share-poster {
+    position: absolute;
+    top: 68px;
+    left: 80px;
+    width: 590px;
+    height: 890px;
+    background: #efefef;
+    border-radius: 20px;
+    z-index: -2;
+    .content-wrap {
+      position: absolute;
+      top: 0;
+      left: 80px;
+      width: 430px;
+      padding: 0 20px 20px;
+      background: rgba(255,255,255,.3);
+      border-radius: 0 0 20px 20px;
+      .content {
+        width: 100%;
+        padding: 30px;
+        background: rgba(255,255,255,.8);
+        border-radius: 0 0 20px 20px;
+        .name {
+          font-size: 24px;
+          line-height: 48px;
+          font-weight: bolder;
+        }
+        .wish {
+          margin-top: 12px;
+          font-size: 48px;
+          line-height: 88px;
+          font-weight: bolder;
+        }
+        .value {
+          margin-top: 12px;
+          font-size: 24px;
+          line-height: 48px;
+        }
+      }
+    }
+    &.year {
+      .content-wrap {
+        .content {
+          color: #762400;
+        }
+      }
+    }
+    &.birthday {
+      .content-wrap {
+        .content {
+          color: #1E1F60;
+        }
       }
     }
   }
