@@ -1,5 +1,6 @@
-// let hostname = `http://hr.qa.tcent.cn`;
-let hostname = ``;
+
+const { NODE_ENV } = process.env
+const hostname = NODE_ENV === 'production' ? 'http://moa.qa.17u.cn/moahr' : '/moahr'
 
 export default {
   /**
@@ -13,17 +14,17 @@ export default {
   getUrls() {
     return {
       // 我的关注
-      FocusList: `${hostname}/hrapi/api/MocApiGeneralV2/FocusList`,
+      FocusList: `${hostname}/MocApiGeneralV2/FocusList`,
       // 关注、取消关注
-      UpdateStatus: `${hostname}/hrapi/api/MocApiGeneralV2/UpdateStatus`,
+      UpdateStatus: `${hostname}/MocApiGeneralV2/UpdateStatus`,
       // 历史收到的祝福
-      EmployeeWishHistoryList: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishHistoryList`,
+      EmployeeWishHistoryList: `${hostname}/MocApiGeneralV2/EmployeeWishHistoryList`,
       // 贺卡
-      EmployeeWishByCompany: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWishByCompany`,
+      EmployeeWishByCompany: `${hostname}/MocApiGeneralV2/EmployeeWishByCompany`,
       // 祝福详情
-      EmployeeWish: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeWish`,
+      EmployeeWish: `${hostname}/MocApiGeneralV2/EmployeeWish`,
       // 上传图片
-      EmployeeCareUploadFile: `${hostname}/hrapi/api/MocApiGeneralV2/EmployeeCareUploadFile`,
+      EmployeeCareUploadFile: `${hostname}/MocApiGeneralV2/EmployeeCareUploadFile`,
     }
   },
 

@@ -43,12 +43,12 @@ module.exports = {
         proxyTable: 
         [
             {
-                pattern: ['/hrapi'],
+                pattern: ['/moahr'],
                 options: {
-                    target: 'http://hr.qa.tcent.cn',
+                    target: 'http://moa.qa.17u.cn/',
                     changeOrigin: true,
                     pathRewrite: {
-                        '^/hrapi': '/hrapi', // rewrite path
+                        '^/moahr': '/moahr', // rewrite path
                     }
                 }
             }

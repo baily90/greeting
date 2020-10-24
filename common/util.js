@@ -193,7 +193,7 @@ export default {
     // 根据环境变量反射域名
     hostRefect() {
         const { NODE_ENV } = process.env
-        if(NODE_ENV === 'production') return 'http://air.nongnet.net/fontEnd'
+        if(NODE_ENV === 'production') return 'http://moa.qa.17u.cn/moahr/AREAS/HR/release'
         return 'http://localhost:3009'
     }
 }
