@@ -124,15 +124,18 @@ export default {
       }
       const url = apis.getUrls().SavaEmployeeWish;
       const params = {
-        loginUserId: this.loginUserId,
-        userId: this.UserId,
-        gift: this.giftId,
-        blessingContent: this.birthContent.COPY,
-        tweetImg: "",
-        cardBackground: this.birthDetail.CARD_BACKGROUND[0].url,
-        careSetupId: this.birthDetail.CARE_SETUP_ID,
-        icon: this.birthDetail.ICON,
-        uploadGift: this.uploadGift,
+        newModel: {
+          // loginUserId: this.loginUserId,
+          // userId: this.UserId,
+          gift: this.giftId,
+          blessingContent: this.birthContent.COPY,
+          // tweetImg: "",
+          cardBackground: this.birthDetail.CARD_BACKGROUND[0].ROW_ID,
+          // careSetupId: this.birthDetail.CARE_SETUP_ID,
+          icon: this.birthDetail.ICON,
+          uploadGift: this.uploadGift,
+          sendRecordId: this.id,
+        },
       };
       axiosWrap
         .post(url, params)
@@ -145,6 +148,7 @@ export default {
           }
         })
         .catch((err) => {
+          Toast("发送失败");
           this.isLoading = false;
           console.error(err);
         });
@@ -227,12 +231,12 @@ export default {
     //getList
     getList() {
       const url = apis.getUrls().EmployeeWish;
-      const params = {
-        id: this.id,
-        wishType: this.wishType,
-        UserId: this.UserId,
-        year: this.year,
-      };
+      let params = {};
+      if (this.isHistory) {
+        params.id = this.id;
+      } else {
+        params.wishId = this.id;
+      }
       axiosWrap
         .get(url, { params })
         .then(({ data }) => {
@@ -240,6 +244,10 @@ export default {
             this.birthDetail = data.Data;
             this.birthIndex = 0;
             this.birthContent = this.birthDetail.COPY_LIST[this.birthIndex];
+            if (!this.isHistory) {
+              this.giftId = this.birthDetail.GIFT[0].ROW_ID;
+              this.birthDetail.GIFT[0].IS_CHIOSE = true;
+            }
             console.log(this.birthDetail);
           }
         })

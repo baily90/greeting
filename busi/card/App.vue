@@ -23,8 +23,16 @@
         </div>
       </van-swipe-item>
     </van-swipe>
+    <!-- 合成分享图片 -->
+    <div id="share-poster" :class="{'year':wishType=='YEAR', 'birthday':wishType=='BIRTHDAY'}" ref="poster" @click.stop>
+      <img :src="shareInfo.URL" width="100%" height="100%" alt="">
+      <div class="content-wrap">
+        <div class="content" v-html="shareInfo.COPY">
+        </div>
+      </div>
+    </div>
     <!-- 分享弹窗 -->
-    <Share :isShow.sync="isShowShareDialog" :wishType="wishType"></Share>
+    <Share :isShow.sync="isShowShareDialog" :share="shareInfo" :wishType="wishType"></Share>
   </div>
 </template>
 
@@ -42,10 +50,10 @@ export default {
   data() {
     return {
       id: utils.getPara('id'),
-      UserId: utils.getPara('UserId'),
-      wishType: utils.getPara('wishType'),
+      wishType: '',
+      shareInfo: {},
       list: [],
-      isShowShareDialog: true
+      isShowShareDialog: false
     }
   },
   computed:  {
@@ -62,7 +70,7 @@ export default {
     },
     async EmployeeWishByCompany () {
       try {
-        const {data} = await EmployeeWishByCompany({id:this.id,UserId:this.UserId,wishType:this.wishType})
+        const {data} = await EmployeeWishByCompany({id:this.id})
         if(data && data.ResultCode == 0) {
           const resData = data.Data
           const COPY_LIST = resData.COPY_LIST // 祝福语
@@ -72,12 +80,24 @@ export default {
           const YEAR_COUNT = resData.YEAR_COUNT // 工龄-年
           const DAY_COUNT = resData.DAY_COUNT // 工龄-日
           const INDATE = resData.INDATE // 入职日期
+          const RECEIVER_NAME = resData.RECEIVER_NAME // 接受者姓名
+          const shareInfo = resData.shareInfo // 分享信息
+          this.wishType = resData.WISH_TYPE  //贺卡类别
 
+          // 分享信息处理
+          if(shareInfo && shareInfo.COPY) {
+            shareInfo.COPY = shareInfo.COPY.replaceAll('|', '<br/>').replaceAll('[NAME]', RECEIVER_NAME)
+          }
+          this.shareInfo = shareInfo
+
+          // 勋章处理
           let medal = '<div style="display:flex;flex-wrap:wrap;width:100%">'
           MEDAL_LIST && MEDAL_LIST.forEach((item, index) => {
             medal += `<img style="margin-top:0.16rem;margin-right:0.16rem;width:1.33rem;height:1.33rem" src="${item.medal_url}">`
           })
           medal += `</div>`
+
+          // 祝福处理
           COPY_LIST && COPY_LIST.map(item => {
             // 处理 | [YEAR] [DAY] [INDATE] [MEDALLIST]
             item.COPY = item.COPY.replaceAll('|', '<br/>')
@@ -112,7 +132,7 @@ export default {
       this.isShowShareDialog = !this.isShowShareDialog
     },
     change(index) {
-      console.log(index)
+      
     },
     next() {
       this.$refs.swipe.next()
@@ -222,6 +242,62 @@ export default {
         background: #FF8A41;
         font-size: 36px;
         color: #fff;
+      }
+    }
+  }
+
+  #share-poster {
+    position: absolute;
+    top: 68px;
+    left: 80px;
+    width: 590px;
+    height: 890px;
+    background: #efefef;
+    border-radius: 20px;
+    z-index: -2;
+    .content-wrap {
+      position: absolute;
+      top: 0;
+      left: 80px;
+      width: 430px;
+      padding: 0 20px 20px;
+      background: rgba(255,255,255,.3);
+      border-radius: 0 0 20px 20px;
+      .content {
+        width: 100%;
+        padding: 30px;
+        background: rgba(255,255,255,.8);
+        border-radius: 0 0 20px 20px;
+        .name {
+          font-size: 24px;
+          line-height: 48px;
+          font-weight: bolder;
+        }
+        .wish {
+          margin-top: 12px;
+          font-size: 48px;
+          line-height: 88px;
+          font-weight: bolder;
+        }
+        .value {
+          margin-top: 12px;
+          font-size: 24px;
+          line-height: 48px;
+        }
+      }
+    }
+    &.year {
+      .content-wrap {
+        .content {
+          color: #762400;
+        }
+      }
+    }
+    &.birthday {
+      .content-wrap {
+        .content {
+          color: #1E1F60;
+        }
       }
     }
   }

@@ -50,7 +50,7 @@ export default {
       }
     },
     go2Card(obj) {
-      location.href = `${this.host}/card?id=${obj.ROW_ID}&UserId=${obj.EMPLOYEE_ID}&wishType=${obj.WISH_TYPE}`
+      location.href = `${this.host}/card?id=${obj.ROW_ID}`
     }
   }
 }
