@@ -4,7 +4,7 @@
       <div
         :class="
           wishType == 'YEAR'
-            ? 'birth-background year-background'
+            ? 'birth-background year-background whiteColor'
             : 'birth-background'
         "
       >
@@ -13,7 +13,10 @@
           {{ birthDetail.EMPLOYEE_NAME }} {{ birthDetail.EMPLOYEE_CODE }}
           {{ birthDetail.DEPARTMENT_NAME }}
         </div>
-        <div class="date">
+        <div class="date" v-if="wishType == 'YEAR'">
+          入职{{ birthDetail.YEAR_COUNT }}周年
+        </div>
+        <div class="date" v-else>
           {{ birthDetail.BIRTHDAY | monthFilter }}月{{
             birthDetail.BIRTHDAY | dateFilter
           }}日生日
@@ -275,6 +278,9 @@ export default {
 .grey {
   background: #d2d2d2 !important;
 }
+.whiteColor {
+  color: #ffffff !important;
+}
 .year-background {
   background: url("./assets/year.png") no-repeat !important;
 }
@@ -285,6 +291,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  color: #a9792a;
 }
 .birth-background img {
   width: 130px;
@@ -295,13 +302,11 @@ export default {
 }
 .birth-background .name {
   font-size: 30px;
-  color: #a9792a;
   margin-top: 20px;
   margin-bottom: 10px;
 }
 .birth-background .date {
   font-size: 36px;
-  color: #a9792a;
 }
 .birth-select {
   font-size: 28px;
@@ -418,12 +423,13 @@ export default {
 }
 .birth-content textarea {
   margin: 20px 0;
+  font-size: 28px;
   width: calc(100% - 40px);
   height: 210px;
   background: #f8f8f8;
   padding: 20px;
+  line-height: 1;
   border: none;
-  font-size: 28px;
   color: #333333;
   border-radius: 10px;
 }
