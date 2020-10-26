@@ -3,7 +3,7 @@
     <div class="bg-page"></div>
     <div class="list-wishes" v-if="list && list.length">
       <div class="item-wishes" v-for="(item, index) in list" :key="index" @click="go2Card(item)">
-        <div class="date">{{item.SEND_TIME  | dateFormat('yyyy-MM-dd hh:mm:ss')}}</div>
+        <div class="date">{{item.SEND_TIME}}</div>
         <div class="content-wishes">
           <div class="img-wrap">
             <img :src="item.URL" alt="">

@@ -26,7 +26,9 @@ export default {
       // 上传图片
       EmployeeCareUploadFile: `${hostname}/moahr/EmployeeCareWX/EmployeeCareUploadFile`,
       // 发送祝福
-      SavaEmployeeWish: `${hostname}/moahr/EmployeeCareWX/SavaEmployeeWish`
+      SavaEmployeeWish: `${hostname}/moahr/EmployeeCareWX/SavaEmployeeWish`,
+      // 获取企业微信签名参数
+      shareParam: `${hostname}/moahr/EmployeeCareWX/shareParam`
     }
   },
 
