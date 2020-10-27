@@ -35,7 +35,7 @@
               {{ item.DEPARTMENT_NAME }}）</span
             >
           </div>
-          <div>{{ item.SEND_TIME | dateFormat }}</div>
+          <div>{{ item.SEND_TIME }}</div>
         </div>
       </van-list>
     </div>
