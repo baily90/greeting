@@ -13,8 +13,8 @@ const webpackConfig = merge(baseWebpackConfig, {
     mode: 'production',
     output: {
         // path: config.build.assetsRoot,
-        filename: 'build.[hash:8].js',
-        chunkFilename: '[name].[hash:8].js',
+        filename: 'build.js',
+        chunkFilename: '[name].js',
         // publicPath: config.build.assetsCdnPublicPath,
 
     },
@@ -43,8 +43,8 @@ const webpackConfig = merge(baseWebpackConfig, {
         new MiniCssExtractPlugin({
             // Options similar to the same options in webpackOptions.output
             // both options are optional
-            filename: '[name].[contenthash:8].css',
-            chunkFilename: '[id].[contenthash:8].css'
+            filename: '[name].css',
+            chunkFilename: '[id].css'
         }),
 
         // Compress extracted CSS. We are using this plugin so that possible
