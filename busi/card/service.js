@@ -6,6 +6,6 @@ export function EmployeeWishByCompany(params) {
 export function EmployeeCareUploadFile(data) {
   return axiosWrap.post(`${apis.getUrls().EmployeeCareUploadFile}`, data)
 }
-export function shareParam() {
-  return axiosWrap.get(`${apis.getUrls().shareParam}`)
+export function shareParam(params) {
+  return axiosWrap.get(`${apis.getUrls().shareParam}`, {params})
 }

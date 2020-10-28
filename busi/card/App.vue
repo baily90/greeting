@@ -32,12 +32,12 @@
       </div>
     </div>
     <!-- 分享弹窗 -->
-    <Share :isShow.sync="isShowShareDialog" :share="shareInfo" :wishType="wishType"></Share>
+    <Share :isShow.sync="isShowShareDialog" :share="shareInfo" :wishType="wishType" @save="save" @share="share"></Share>
   </div>
 </template>
 
 <script>
-import { Swipe, SwipeItem } from 'vant'
+import { Swipe, SwipeItem, Toast } from 'vant'
 import Share from './components/Share'
 import { EmployeeWishByCompany, shareParam } from './service'
 import utils from './../../common/util'
@@ -53,7 +53,8 @@ export default {
       wishType: '',
       shareInfo: {},
       list: [],
-      isShowShareDialog: false
+      isShowShareDialog: false,
+      RECEIVER_NAME: ''
     }
   },
   computed:  {
@@ -67,10 +68,10 @@ export default {
   methods: {
     init() {
       this.EmployeeWishByCompany()
-      // this.initShareParam()
+      this.initShareParam()
     },
     async initShareParam() {
-      const { data } = await shareParam()
+      const { data } = await shareParam({url: location.href})
       if(data && data.ResultCode == 0) {
         const { appId, timestamp, nonceStr, signature } = data.Data
         wx.config({
@@ -80,7 +81,7 @@ export default {
           timestamp: timestamp, // 必填，生成签名的时间戳
           nonceStr: nonceStr, // 必填，生成签名的随机串
           signature: signature,// 必填，签名，见附录1
-          jsApiList: ['chooseImage'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+          jsApiList: ['shareWechatMessage', 'saveImageToPhotosAlbum'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
         })
       }
     },
@@ -96,13 +97,14 @@ export default {
           const YEAR_COUNT = resData.YEAR_COUNT // 工龄-年
           const DAY_COUNT = resData.DAY_COUNT // 工龄-日
           const INDATE = resData.INDATE // 入职日期
-          const RECEIVER_NAME = resData.RECEIVER_NAME // 接受者姓名
+          this.RECEIVER_NAME = resData.RECEIVER_NAME // 接受者姓名
           const shareInfo = resData.shareInfo // 分享信息
           this.wishType = resData.WISH_TYPE  //贺卡类别
 
           // 分享信息处理
           if(shareInfo && shareInfo.COPY) {
-            shareInfo.COPY = shareInfo.COPY.replaceAll('|', '<br/>').replaceAll('[NAME]', RECEIVER_NAME)
+            shareInfo.COPY = shareInfo.COPY.replaceAll('|', '<br/>').replaceAll('[NAME]', this.RECEIVER_NAME)
+            shareInfo.shareDesc = shareInfo.COPY.replaceAll('|', '').replaceAll('[NAME]', this.RECEIVER_NAME)
           }
           this.shareInfo = shareInfo
 
@@ -147,11 +149,36 @@ export default {
     toggleShowShareDialog() {
       this.isShowShareDialog = !this.isShowShareDialog
     },
-    change(index) {
-      
-    },
     next() {
       this.$refs.swipe.next()
+    },
+    /**
+     * 保存图片
+     */
+    save(imgUrl) {
+      alert(JSON.stringify(wx.saveImageToPhotosAlbum))
+    },
+    /**
+     * 分享图片
+     */
+    share(imgUrl) {
+      // 企业微信不支持仅分享图片，以下为分享图文链接
+      wx.invoke('shareWechatMessage', 
+      {
+        title: `${this.RECEIVER_NAME}-${this.wishType == 'BIRTHDAY' ? '生日' : '周年'}贺卡`, // 分享标题
+        desc: this.shareInfo.shareDesc, // 分享描述
+        link: location.href, // 分享链接
+        imgUrl, // 分享封面
+      }, res => {
+        if (res.err_msg == "shareWechatMessage:ok") {
+          Toast('分享成功')
+        }else if(res.err_msg == "shareWechatMessage:cancel") {
+          Toast('取消分享')
+        }else {
+          Toast('分享失败')
+        }
+      }
+);
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <van-overlay :show="show" class-name="overLay" :lock-scroll="false" @click="overlayAutoClose">
-    <div class="shareImg">
+    <div class="shareImg"  @click.stop>
       <img v-if="imgUrl" :src="imgUrl" width="100%" height="100%" alt="">
     </div>
     <div class="btn-area" @click.stop>
@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     posterHandler(type) {
-      console.log(type)
+      this.$emit(type, this.imgUrl)
     },
     async EmployeeCareUploadFile() {
       const canvas = await html2canvas(document.getElementById('share-poster'), {allowTaint: true,useCORS: true,backgroundColor: "transparent" })
