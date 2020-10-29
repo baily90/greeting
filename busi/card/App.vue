@@ -1,13 +1,16 @@
 <template>
   <div class="container-birthdayCard">
+    <!-- 背景色 -->
     <div class="bg-page"></div>
+    <!-- 背景音乐 -->
+    <audio ref="audio" :src="cardMusic" autoplay loop></audio>
+    <!-- 轮播 -->
     <van-swipe
       class="my-swipe"
       ref="swipe"
       :vertical="true"
       :show-indicators="false"
       :loop="false"
-      @change="change"
     >
       <van-swipe-item
         v-for="(item, index) in list"
@@ -63,26 +66,25 @@
       </div>
     </div>
     <!-- 分享弹窗 -->
-    <Share
-      :isShow.sync="isShowShareDialog"
-      :share="shareInfo"
-      :wishType="wishType"
-      @save="save"
-      @share="share"
-    ></Share>
+    <van-overlay :show="isShowShareDialog" :lock-scroll="false" @click="toggleShowShareDialog">
+      <div class="shareImg" v-if="imgUrl" @click.stop>
+        <img :src="imgUrl" width="100%" height="100%" alt="">
+        <img class="tips" src="./assets/icon-btn-share.png" alt="">
+      </div>
+    </van-overlay>
   </div>
 </template>
 
 <script>
-import { Swipe, SwipeItem, Toast } from "vant";
-import Share from "./components/Share";
-import { EmployeeWishByCompany, shareParam } from "./service";
+import html2canvas from 'html2canvas'
+import { Swipe, SwipeItem, Toast, Overlay } from "vant";
+import { EmployeeWishByCompany, shareParam, EmployeeCareUploadFile } from "./service";
 import utils from "./../../common/util";
 export default {
   components: {
-    Share,
     [Swipe.name]: Swipe,
     [SwipeItem.name]: SwipeItem,
+    [Overlay.name]: Overlay
   },
   data() {
     return {
@@ -92,6 +94,8 @@ export default {
       list: [],
       isShowShareDialog: false,
       RECEIVER_NAME: "",
+      cardMusic: '',
+      imgUrl:  ''
     };
   },
   computed: {
@@ -105,7 +109,7 @@ export default {
   methods: {
     init() {
       this.EmployeeWishByCompany();
-      this.initShareParam();
+      // this.initShareParam();
     },
     async initShareParam() {
       const { data } = await shareParam({ url: location.href });
@@ -118,7 +122,7 @@ export default {
           timestamp: timestamp, // 必填，生成签名的时间戳
           nonceStr: nonceStr, // 必填，生成签名的随机串
           signature: signature, // 必填，签名，见附录1
-          jsApiList: ["shareWechatMessage", "saveImageToPhotosAlbum"], // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+          jsApiList: ["shareWechatMessage"], // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
         });
       }
     },
@@ -136,18 +140,14 @@ export default {
           const INDATE = resData.INDATE; // 入职日期
           this.RECEIVER_NAME = resData.RECEIVER_NAME; // 接受者姓名
           const shareInfo = resData.shareInfo; // 分享信息
-          this.wishType = resData.WISH_TYPE; //贺卡类别
-          console.log(this.wishType, shareInfo);
+          this.wishType = resData.WISH_TYPE; // 贺卡类别
+          this.cardMusic = resData.cardMusic; // 播放音乐 
           // 分享信息处理
           if (shareInfo && shareInfo.COPY) {
             shareInfo.COPY = shareInfo.COPY.replace(/\|/g, "<br/>").replace(
-              /\[NAME]/g,
+              /\[NAME\]/g,
               this.RECEIVER_NAME
-            );
-            shareInfo.shareDesc = shareInfo.COPY.replace(/\|/g, "").replace(
-              /\[NAME]/g,
-              this.RECEIVER_NAME
-            );
+            )
           }
           this.shareInfo = shareInfo;
 
@@ -163,11 +163,11 @@ export default {
           COPY_LIST &&
             COPY_LIST.map((item) => {
               // 处理 | [YEAR] [DAY] [INDATE] [MEDALLIST]
-              item.COPY = item.COPY.replace("/|/-g", "<br/>")
-                .replace(/\[YEAR]/g, YEAR_COUNT)
-                .replace(/\[DAY]/g, DAY_COUNT)
-                .replace(/\[INDATE]/g, INDATE)
-                .replace(/\[MEDALLIST]/g, medal);
+              item.COPY = item.COPY.replace(/\|/g, "<br/>")
+                .replace(/\[YEAR\]/g, YEAR_COUNT)
+                .replace(/\[DAY\]/g, DAY_COUNT)
+                .replace(/\[INDATE\]/g, INDATE)
+                .replace(/\[MEDALLIST\]/g, medal);
               return item;
             });
           CARD_BACKGROUND &&
@@ -196,45 +196,39 @@ export default {
         console.log("FocusList接口异常" + error);
       }
     },
+    async EmployeeCareUploadFile() {
+      this.removeMusicAutoPlay()
+      const canvas = await html2canvas(this.$refs.poster, {useCORS: true,backgroundColor: "transparent" })
+      let base64Url = canvas.toDataURL('image/png')
+      base64Url = base64Url.substring(base64Url.indexOf('base64,')+7,base64Url.length)
+      const requestData = {file:base64Url,file_name:`poster_${this.wishType}.png`}
+      const {data} = await EmployeeCareUploadFile(requestData)
+      if(data && data.ResultCode == 0) {
+        this.imgUrl = data.Data
+      }
+    },
     toggleShowShareDialog() {
       this.isShowShareDialog = !this.isShowShareDialog;
+      if(this.isShowShareDialog && !this.imgUrl) {
+        this.EmployeeCareUploadFile()
+      }
     },
     next() {
       this.$refs.swipe.next();
     },
-    change() {},
-    /**
-     * 保存图片
-     */
-    save(imgUrl) {
-      alert(JSON.stringify(wx.saveImageToPhotosAlbum));
-    },
-    /**
-     * 分享图片
-     */
-    share(imgUrl) {
-      // 企业微信不支持仅分享图片，以下为分享图文链接
-      wx.invoke(
-        "shareWechatMessage",
-        {
-          title: `${this.RECEIVER_NAME}-${
-            this.wishType == "BIRTHDAY" ? "生日" : "周年"
-          }贺卡`, // 分享标题
-          desc: this.shareInfo.shareDesc, // 分享描述
-          link: location.href, // 分享链接
-          imgUrl, // 分享封面
-        },
-        (res) => {
-          if (res.err_msg == "shareWechatMessage:ok") {
-            Toast("分享成功");
-          } else if (res.err_msg == "shareWechatMessage:cancel") {
-            Toast("取消分享");
-          } else {
-            Toast("分享失败");
-          }
+    //解决ios11下，重复加载背景音乐的bug
+    removeMusicAutoPlay() {
+      const ua = navigator.userAgent
+      if(!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+        const reg = /os [\d._]*/gi
+        const verinfo = ua.match(reg) 
+        let version = (verinfo+"").replace(/[^0-9|_.]/ig,"").replace(/_/ig,".")
+        let typeNum = version.split(".")[0]; //获取系统版本号的第一位数字
+        if(typeNum >= 11) {
+          this.$refs.audio.removeAttribute('autoplay')
         }
-      );
-    },
+      }
+    }
   },
 };
 </script>
@@ -397,6 +391,22 @@ export default {
           color: #1e1f60;
         }
       }
+    }
+  }
+
+  .shareImg {
+    position: absolute;
+    top: 68px;
+    left: 80px;
+    width: 590px;
+    height: 890px;
+    border-radius: 20px;
+    .tips {
+      position: absolute;
+      left: 135px;
+      bottom: 40px;
+      width: 320px;
+      height: 44px;
     }
   }
 
