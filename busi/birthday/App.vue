@@ -32,18 +32,22 @@
           @click="handleSlectGift(item, index)"
           :key="index"
         />
-        <div class="uploadContain">
+        <img
+          v-show="!isHistory && selectUpload"
+          class="selected"
+          :src="uploadImg"
+        />
+        <div class="uploadContain" v-if="!isHistory && !selectUpload">
           <img
             class="upload"
-            :src="uploadGift"
+            :src="uploadImg"
             alt=""
-            :style="{ border: uploadGift ? 'none' : '' }"
+            :style="{
+              background: uploadImg ? '#f9f6f4' : '#ffffff',
+              border: uploadImg ? 'none' : '',
+            }"
           />
-          <input
-            v-if="!isHistory && !uploadGift"
-            type="file"
-            @change="handleUpload($event)"
-          />
+          <input type="file" @change="handleUpload($event)" />
         </div>
       </div>
       <div class="birth-fill">
@@ -100,6 +104,7 @@ export default {
       wishType: utils.getPara("wishType"),
       UserId: utils.getPara("UserId"),
       year: utils.getPara("year"),
+      selectUpload: false,
     };
   },
   components: {
@@ -118,6 +123,12 @@ export default {
     },
   },
   created() {
+    if (this.wishType == "BIRTHDAY") {
+      document.querySelector("title").innerText = "生日祝福";
+    } else {
+      document.querySelector("title").innerText = "周年祝福";
+    }
+
     this.getList();
   },
   methods: {
@@ -136,7 +147,7 @@ export default {
           cardBackground: this.birthDetail.CARD_BACKGROUND[0].ROW_ID,
           // careSetupId: this.birthDetail.CARE_SETUP_ID,
           icon: this.birthDetail.ICON,
-          uploadGift: this.uploadGift,
+          uploadGift: this.uploadImg,
           sendRecordId: this.id,
         },
       };
@@ -192,10 +203,18 @@ export default {
         .then(({ data }) => {
           if (data && data.ResultCode == 0) {
             this.uploadImg = data.Data;
+            this.giftId = "";
+            this.selectUpload = true;
+            this.birthDetail.GIFT.forEach((item) => {
+              item.IS_CHIOSE = false;
+            });
             console.log(data);
+          } else {
+            Toast("上传失败");
           }
         })
         .catch((err) => {
+          Toast("上传失败");
           this.isLoading = false;
           console.error(err);
         });
@@ -205,16 +224,13 @@ export default {
       if (this.isHistory) {
         return;
       }
-      console.log(index, this.giftId);
+      this.selectUpload = false;
       if (!item.IS_CHIOSE) {
         this.giftId = item.ROW_ID;
         this.birthDetail.GIFT.forEach((item) => {
           item.IS_CHIOSE = false;
         });
         this.birthDetail.GIFT[index].IS_CHIOSE = true;
-      } else {
-        this.giftId = "";
-        this.birthDetail.GIFT[index].IS_CHIOSE = false;
       }
     },
     // 换一换

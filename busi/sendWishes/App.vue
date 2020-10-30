@@ -30,14 +30,22 @@
         >
           <div class="name">
             <span>{{ item.EMPLOYEE_NAME }}</span>
-            <span
-              >（{{ item.EMPLOYEE_CODE }} &nbsp;&nbsp;
-              {{ item.DEPARTMENT_NAME }}）</span
-            >
+            <span class="time">{{ item.SEND_TIME | dateFormat }}</span>
           </div>
-          <div>{{ item.SEND_TIME }}</div>
+          <div>
+            <span>{{ item.EMPLOYEE_CODE }}</span>
+            <span class="departmentNamne">{{ item.DEPARTMENT_NAME }}</span>
+          </div>
         </div>
       </van-list>
+    </div>
+
+    <div
+      class="empty"
+      v-if="firstRenderComplete && (!historyList || !historyList.length)"
+    >
+      <img class="icon-empty" src="./assets/icon-empty.png" alt="" />
+      暂无发送的祝福
     </div>
   </div>
 </template>
@@ -68,7 +76,7 @@ export default {
   },
   filters: {
     dateFormat(value) {
-      return value.split("T")[0];
+      return value.split(" ")[0];
     },
   },
   components: {
@@ -113,9 +121,6 @@ export default {
             this.isFinished = data.TOTALCOUNT - this.pageNum * 30 <= 0;
             this.firstRenderComplete = true;
             this.isLoading = false;
-            console.log(11);
-            console.log(this.historyList);
-            console.log(this.firstRenderComplete);
             if (!this.isFinished) {
               this.pageNum++;
             }
@@ -171,17 +176,39 @@ export default {
   background: #ffffff;
 }
 .sendWishes-second .item {
-  height: 100px;
-  line-height: 100px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 20px 0;
+
   font-size: 24px;
   color: #333333;
   border-bottom: 1px solid #ededed;
 }
+.departmentNamne {
+  margin-left: 20px;
+}
+.sendWishes-second .name {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+}
+.sendWishes-second .name .time {
+  color: #999999;
+}
 .sendWishes-second .name span:first-child {
-  font-size: 30px;
+  font-size: 40px;
   font-weight: bold;
+}
+.empty {
+  margin: 132px auto 0;
+  width: 270px;
+  text-align: center;
+  font-size: 28px;
+  color: #bdc7d3;
+  line-height: 40px;
+  .icon-empty {
+    margin-bottom: 40px;
+    width: 270px;
+    height: 270px;
+  }
 }
 </style>
