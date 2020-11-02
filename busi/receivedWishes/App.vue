@@ -57,14 +57,14 @@ export default {
           sendType: 2,
         });
         if (data && data.ResultCode == 0) {
-          // this.list = data.Data;
+          this.list = data.Data;
         }
       } catch (error) {
         console.log("EmployeeWishHistoryList接口异常" + error);
       }
     },
     go2Card(obj) {
-      location.href = `${this.host}/card?id=${obj.ROW_ID}`;
+      location.href = `${this.host}/card?id=${obj.ROW_ID}&loginUserId=${this.loginUserId}`;
     },
   },
 };

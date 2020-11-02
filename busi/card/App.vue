@@ -67,7 +67,7 @@
     </div>
     <!-- 分享弹窗 -->
     <van-overlay :show="isShowShareDialog" :lock-scroll="false" @click="toggleShowShareDialog">
-      <div class="shareImg" v-if="imgUrl" @click.stop>
+      <div class="shareImg" v-if="imgUrl" @click.stop @touchstart="touchStartHandler" @touchend="touchEndHandler">
         <img :src="imgUrl" width="100%" height="100%" alt="">
         <img class="tips" src="./assets/icon-btn-share.png" alt="">
       </div>
@@ -78,7 +78,7 @@
 <script>
 import html2canvas from 'html2canvas'
 import { Swipe, SwipeItem, Toast, Overlay } from "vant";
-import { EmployeeWishByCompany, shareParam, EmployeeCareUploadFile } from "./service";
+import { EmployeeWishByCompany, shareParam, EmployeeCareUploadFile, SavaShareOperate } from "./service";
 import utils from "./../../common/util";
 export default {
   components: {
@@ -88,6 +88,7 @@ export default {
   },
   data() {
     return {
+      loginUserId: utils.getPara("loginUserId"),
       id: utils.getPara("id"),
       wishType: "",
       shareInfo: {},
@@ -95,7 +96,8 @@ export default {
       isShowShareDialog: false,
       RECEIVER_NAME: "",
       cardMusic: '',
-      imgUrl:  ''
+      imgUrl:  '',
+      timeOutEvent: 0
     };
   },
   computed: {
@@ -207,6 +209,9 @@ export default {
         this.imgUrl = data.Data
       }
     },
+    SavaShareOperate() {
+      SavaShareOperate({loginUserId: this.loginUserId})
+    },
     toggleShowShareDialog() {
       this.isShowShareDialog = !this.isShowShareDialog;
       if(this.isShowShareDialog && !this.imgUrl) {
@@ -228,6 +233,20 @@ export default {
           this.$refs.audio.removeAttribute('autoplay')
         }
       }
+    },
+    touchStartHandler() {
+      this.timeOutEvent = setTimeout(() => {
+        // 执行长按事件
+         this.longPress()
+      }, 500)
+      return false
+    },
+    touchEndHandler() {
+      clearTimeout(this.timeOutEvent)
+      this.timeOutEvent = 0
+    },
+    longPress() {
+      this.SavaShareOperate()
     }
   },
 };

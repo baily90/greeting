@@ -9,3 +9,6 @@ export function EmployeeCareUploadFile(data) {
 export function shareParam(params) {
   return axiosWrap.get(`${apis.getUrls().shareParam}`, {params})
 }
+export function SavaShareOperate(data) {
+  return axiosWrap.post(`${apis.getUrls().SavaShareOperate}`, data)
+}
