@@ -146,7 +146,7 @@ export default {
           this.cardMusic = resData.cardMusic; // 播放音乐 
 
           // 设置标题
-          document.title = `${this.wishType == 'BIRTHDAY' ? '生日' : '周年'}贺卡`
+          document.title = `${this.wishType == 'BIRTHDAY' ? '生日' : '周年'}祝福`
           // 分享信息处理
           if (shareInfo && shareInfo.COPY) {
             shareInfo.COPY = shareInfo.COPY.replace(/\|/g, "<br/>").replace(
