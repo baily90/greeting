@@ -8,7 +8,7 @@
             : 'birth-background'
         "
       >
-        <img :src="birthDetail.ICON" alt="" />
+        <img :src="birthDetail.ICON ? birthDetail.ICON : noPerson" alt="" />
         <div class="name">
           {{ birthDetail.EMPLOYEE_NAME }} {{ birthDetail.EMPLOYEE_CODE }}
           {{ birthDetail.DEPARTMENT_NAME }}
@@ -78,6 +78,7 @@ import axiosWrap from "../../common/axiosWrap";
 import apis from "../../common/apis";
 import CToast from "../../components/Toast/Toast";
 import { Field, Toast } from "vant";
+import noPerson from "./assets/noPerson.png";
 export default {
   name: "App",
   data() {
@@ -87,6 +88,7 @@ export default {
       birthContent: {
         COPY: "",
       },
+      noPerson: noPerson,
       //上传的图片
       uploadGift: "",
       //上传后接口返回的url
@@ -156,9 +158,8 @@ export default {
         .then(({ data }) => {
           if (data && data.ResultCode == 0) {
             Toast("发送成功");
-            console.log(data);
           } else {
-            Toast("发送失败");
+            Toast(data.ResultMessage);
           }
         })
         .catch((err) => {
@@ -193,17 +194,17 @@ export default {
       }
     },
     requertUpload(file, file_name) {
-      const self = this
+      const self = this;
       try {
-        self.$loading.show()
+        self.$loading.show();
         const formdata = new FormData();
-        formdata.append('file', file)
-        formdata.append('file_name', file_name)
+        formdata.append("file", file);
+        formdata.append("file_name", file_name);
         const xhr = new XMLHttpRequest();
         xhr.open("POST", apis.getUrls().EmployeeCareUploadFile, true);
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
           if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
-            self.$loading.hide()
+            self.$loading.hide();
             const data = JSON.parse(xhr.responseText);
             if (data && data.ResultCode == 0) {
               self.uploadImg = data.Data;
@@ -216,7 +217,7 @@ export default {
             } else {
               Toast("上传失败");
               self.isLoading = false;
-              self.$loading.hide()
+              self.$loading.hide();
             }
           }
         };
@@ -225,10 +226,8 @@ export default {
         Toast("上传失败");
         self.isLoading = false;
         console.error(error);
-        self.$loading.hide()
+        self.$loading.hide();
       }
-      
-
 
       // const url = apis.getUrls().EmployeeCareUploadFile;
       // const params = {
