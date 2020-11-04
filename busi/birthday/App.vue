@@ -193,31 +193,68 @@ export default {
       }
     },
     requertUpload(file, file_name) {
-      const url = apis.getUrls().EmployeeCareUploadFile;
-      const params = {
-        file,
-        file_name,
-      };
-      axiosWrap
-        .post(url, params)
-        .then(({ data }) => {
-          if (data && data.ResultCode == 0) {
-            this.uploadImg = data.Data;
-            this.giftId = "";
-            this.selectUpload = true;
-            this.birthDetail.GIFT.forEach((item) => {
-              item.IS_CHIOSE = false;
-            });
-            console.log(data);
-          } else {
-            Toast("上传失败");
+      const self = this
+      try {
+        self.$loading.show()
+        const formdata = new FormData();
+        formdata.append('file', file)
+        formdata.append('file_name', file_name)
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", apis.getUrls().EmployeeCareUploadFile, true);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+            self.$loading.hide()
+            const data = JSON.parse(xhr.responseText);
+            if (data && data.ResultCode == 0) {
+              self.uploadImg = data.Data;
+              self.giftId = "";
+              self.selectUpload = true;
+              self.birthDetail.GIFT.forEach((item) => {
+                item.IS_CHIOSE = false;
+              });
+              Toast("上传成功");
+            } else {
+              Toast("上传失败");
+              self.isLoading = false;
+              self.$loading.hide()
+            }
           }
-        })
-        .catch((err) => {
-          Toast("上传失败");
-          this.isLoading = false;
-          console.error(err);
-        });
+        };
+        xhr.send(formdata);
+      } catch (error) {
+        Toast("上传失败");
+        self.isLoading = false;
+        console.error(error);
+        self.$loading.hide()
+      }
+      
+
+
+      // const url = apis.getUrls().EmployeeCareUploadFile;
+      // const params = {
+      //   file,
+      //   file_name,
+      // };
+      // axiosWrap
+      //   .post(url, params)
+      //   .then(({ data }) => {
+      //     if (data && data.ResultCode == 0) {
+      //       this.uploadImg = data.Data;
+      //       this.giftId = "";
+      //       this.selectUpload = true;
+      //       this.birthDetail.GIFT.forEach((item) => {
+      //         item.IS_CHIOSE = false;
+      //       });
+      //       console.log(data);
+      //     } else {
+      //       Toast("上传失败");
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     Toast("上传失败");
+      //     this.isLoading = false;
+      //     console.error(err);
+      //   });
     },
     // 选择礼物
     handleSlectGift(item, index) {

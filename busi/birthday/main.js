@@ -2,6 +2,8 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
 import App from './App';
+import loading from './../../common/loading'
+Vue.use(loading)
 Vue.config.productionTip = false
 new Vue({
     el: '#app',

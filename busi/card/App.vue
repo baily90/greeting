@@ -144,6 +144,9 @@ export default {
           const shareInfo = resData.shareInfo; // 分享信息
           this.wishType = resData.WISH_TYPE; // 贺卡类别
           this.cardMusic = resData.cardMusic; // 播放音乐 
+
+          // 设置标题
+          document.title = `${this.wishType == 'BIRTHDAY' ? '生日' : '周年'}贺卡`
           // 分享信息处理
           if (shareInfo && shareInfo.COPY) {
             shareInfo.COPY = shareInfo.COPY.replace(/\|/g, "<br/>").replace(
