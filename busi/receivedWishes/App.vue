@@ -57,7 +57,11 @@ export default {
           sendType: 2,
         });
         if (data && data.ResultCode == 0) {
-          this.list = data.Data;
+          this.list = data.Data && data.Data.map(item => {
+            item.TWEET_TITLE = item.TWEET_TITLE.replace(/\[NAME\]/g, item.EMPLOYEE_NAME).replace(/\[YEAR\]/g, item.YEAR_COUNT).replace(/\[DAY\]/g, item.DAY_COUNT)
+            item.TWEET_CONTENT = item.TWEET_CONTENT.replace(/\[NAME\]/g, item.EMPLOYEE_NAME).replace(/\[YEAR\]/g, item.YEAR_COUNT).replace(/\[DAY\]/g, item.DAY_COUNT)
+            return item 
+          })
         }
       } catch (error) {
         console.log("EmployeeWishHistoryList接口异常" + error);
