@@ -48,7 +48,7 @@
             :class="{ act: item.IS_CARE != 1 }"
             @click="UpdateStatus(item)"
           >
-            {{ item.IS_CARE == 1 ? "已关注" : "关注" }}
+            {{ item.IS_CARE == 1 ? "取消关注" : "关注" }}
           </div>
         </div>
       </div>
@@ -280,7 +280,7 @@ input {
         width: 100px;
         height: 46px;
         font-size: 24px;
-        color: #b7b7b7;
+        color: #999;
         border: 1px solid #dadad9;
         &.act {
           border: 1px solid #ffc844;
