@@ -38,6 +38,7 @@
           :src="uploadImg"
         />
         <div class="uploadContain" v-if="!isHistory && !selectUpload">
+          <div class="icon-plus" v-if="!uploadImg"></div>
           <img
             class="upload"
             :src="uploadImg"
@@ -414,25 +415,34 @@ export default {
   position: absolute;
   width: 100%;
 }
-.birth-gift .upload::after {
-  content: "";
+.icon-plus {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 48px;
-  margin-left: -24px;
-  margin-top: -2px;
-  border-top: 4px solid #efefef;
-}
-.birth-gift .upload::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  height: 48px;
-  margin-left: -2px;
-  margin-top: -24px;
-  border-left: 4px solid #efefef;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  &:after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 48px;
+    margin-left: -24px;
+    margin-top: -2px;
+    border-top: 4px solid #efefef;
+    z-index: 1;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 48px;
+    margin-left: -2px;
+    margin-top: -24px;
+    border-left: 4px solid #efefef;
+    z-index: 1;
+  }
 }
 .birth-fill {
   font-size: 28px;
