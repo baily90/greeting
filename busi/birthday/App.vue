@@ -297,6 +297,9 @@ export default {
         .get(url, { params })
         .then(({ data }) => {
           if (data && data.ResultCode == 0) {
+            if(data.IsSend) {
+              this.isHistory = true
+            }
             this.birthDetail = data.Data;
             this.birthIndex = 0;
             this.birthContent = this.birthDetail.COPY_LIST[this.birthIndex];
