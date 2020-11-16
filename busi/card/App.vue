@@ -1,5 +1,5 @@
 <template>
-  <div class="container-birthdayCard">
+  <div class="container-birthdayCard" v-swipeup="swipeup">
     <!-- 背景色 -->
     <div class="bg-page"></div>
     <!-- 背景音乐 -->
@@ -11,6 +11,7 @@
       :vertical="true"
       :show-indicators="false"
       :loop="false"
+      @change="change"
     >
       <van-swipe-item
         v-for="(item, index) in list"
@@ -43,13 +44,13 @@
           <div class="gift">
             <img :src="item.copy.GIFT" alt="" />
           </div>
-          <div
+          <!-- <div
             class="btn-share"
             v-if="item.isLastPage"
             @click="toggleShowShareDialog"
           >
             炫耀一下
-          </div>
+          </div> -->
         </div>
       </van-swipe-item>
     </van-swipe>
@@ -80,6 +81,7 @@ import html2canvas from 'html2canvas'
 import { Swipe, SwipeItem, Toast, Overlay } from "vant";
 import { EmployeeWishByCompany, shareParam, EmployeeCareUploadFile, SavaShareOperate } from "./service";
 import utils from "./../../common/util";
+import vueTouch from './../../common/touch'
 export default {
   components: {
     [Swipe.name]: Swipe,
@@ -97,7 +99,9 @@ export default {
       RECEIVER_NAME: "",
       cardMusic: '',
       imgUrl:  '',
-      timeOutEvent: 0
+      timeOutEvent: 0,
+      currentIndex: 0,
+      isLastSwiper: false
     };
   },
   computed: {
@@ -155,7 +159,9 @@ export default {
             )
           }
           this.shareInfo = shareInfo;
-
+          setTimeout(() => {
+            this.EmployeeCareUploadFile()
+          }, 0)
           // 勋章处理
           let medal = '<div style="display:flex;flex-wrap:wrap;width:100%">';
           MEDAL_LIST &&
@@ -217,9 +223,9 @@ export default {
     },
     toggleShowShareDialog() {
       this.isShowShareDialog = !this.isShowShareDialog;
-      if(this.isShowShareDialog && !this.imgUrl) {
-        this.EmployeeCareUploadFile()
-      }
+      // if(this.isShowShareDialog && !this.imgUrl) {
+      //   this.EmployeeCareUploadFile()
+      // }
     },
     next() {
       this.$refs.swipe.next();
@@ -250,8 +256,29 @@ export default {
     },
     longPress() {
       this.SavaShareOperate()
+    },
+    change(index) {
+      this.isLastSwiper = false
+      this.currentIndex = index
+    },
+    swipeup() {
+      if(this.isLastSwiper) {
+        this.toggleShowShareDialog()
+      }
+      if(this.currentIndex == this.list.length-1) {
+        this.isLastSwiper = true
+      }else {
+        this.isLastSwiper = false
+      }
     }
   },
+  directives: {
+    swipeup: {
+      bind: function(el, binding) {
+        new vueTouch(el,binding,"swipeup")
+      }
+    }
+  }
 };
 </script>
 
