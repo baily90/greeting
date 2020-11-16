@@ -32,6 +32,9 @@
           @click="handleSlectGift(item, index)"
           :key="index"
         />
+        <div class="img-box" v-show="isHistory && birthDetail.UPLOAD_GIFT">
+          <img :src="birthDetail.UPLOAD_GIFT" />
+        </div>
         <img
           v-show="!isHistory && selectUpload"
           class="selected"
@@ -306,6 +309,8 @@ export default {
             if (!this.isHistory) {
               this.giftId = this.birthDetail.GIFT[0].ROW_ID;
               this.birthDetail.GIFT[0].IS_CHIOSE = true;
+            } else {
+              this.birthContent.COPY = this.birthDetail.BLESSING_CONTENTs
             }
             console.log(this.birthDetail);
           }
@@ -398,6 +403,32 @@ export default {
   opacity: 0;
   width: 100%;
   height: 100%;
+}
+.img-box {
+  position: relative;
+  width: calc(25% - 42px);
+  height: 112px;
+  border: 4px solid #ff592f;
+  box-sizing: border-box;
+  border-radius: 10px;
+  
+  &:after {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    content: '';
+    width: 100%;
+    height: 100%;
+    border: 4px solid transparent;
+    background: url("./assets/selected.png") no-repeat;
+    background-position-x: 54px;
+    background-position-y: -4px;
+    z-index: 1;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 .birth-gift .selected {
   width: calc(25% - 42px);
