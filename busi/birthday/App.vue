@@ -310,7 +310,7 @@ export default {
               this.giftId = this.birthDetail.GIFT[0].ROW_ID;
               this.birthDetail.GIFT[0].IS_CHIOSE = true;
             } else {
-              this.birthContent.COPY = this.birthDetail.BLESSING_CONTENTs
+              this.birthContent.COPY = this.birthDetail.BLESSING_CONTENT
             }
             console.log(this.birthDetail);
           }
